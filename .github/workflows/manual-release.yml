@@ -1,0 +1,34 @@
+name: Manual Maven Release
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      version:
+        default: 'default'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Java and Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: 'temurin'
+      
+      - name: Update version
+        if: ${{ inputs.version != 'default' }}
+        run: 'mvn versions:set -DnewVersion=${{ inputs.version }}'
+
+      - name: Release Maven package
+        uses: samuelmeuli/action-maven-publish@v1.4.0
+        with:
+          maven_profiles: dev-build,deploy
+          gpg_private_key: ${{ secrets.gpg_private_key }}
+          gpg_passphrase: ${{ secrets.gpg_passphrase }}
+          nexus_username: ${{ secrets.nexus_username }}
+          nexus_password: ${{ secrets.nexus_password }}
