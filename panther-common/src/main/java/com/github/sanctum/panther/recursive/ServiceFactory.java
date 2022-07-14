@@ -2,8 +2,6 @@ package com.github.sanctum.panther.recursive;
 
 import com.github.sanctum.panther.container.PantherEntryMap;
 import com.github.sanctum.panther.container.PantherMap;
-import com.github.sanctum.panther.file.JsonAdapter;
-import com.github.sanctum.panther.file.Node;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +57,9 @@ public final class ServiceFactory {
 	 */
 	public <T extends Service> @Nullable T getService(@NotNull Class<T> clazz) {
 		ServiceLoader<T> loader = getLoader(clazz);
-		return loader != null ? loader.load() : null;
+		if (loader != null) return loader.load();
+		newLoader(clazz);
+		return null;
 	}
 
 }

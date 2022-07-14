@@ -1,5 +1,6 @@
 package com.github.sanctum.panther.util;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,15 @@ public final class SimpleAsynchronousTask {
 	}
 
 	public static void runLater(@NotNull Runnable runnable, long wait) {
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				runnable.run();
+			}
+		}, wait);
+	}
+
+	public static void runLater(@NotNull Runnable runnable, Date wait) {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {

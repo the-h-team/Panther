@@ -3,7 +3,7 @@ package com.github.sanctum.panther.event;
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherList;
-import com.github.sanctum.panther.util.LoggerService;
+import com.github.sanctum.panther.util.PantherLogger;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -492,7 +492,7 @@ public abstract class Vent {
 								registerSubscription(m, mClass, subscribe.get());
 							}
 						} else {
-							LoggerService.getInstance().getLogger().severe("Error registering " + m.getDeclaringClass() + "#" +
+							PantherLogger.getInstance().getLogger().severe("Error registering " + m.getDeclaringClass() + "#" +
 									m.getName());
 						}
 					}
@@ -509,7 +509,7 @@ public abstract class Vent {
 					Class<?> parameterClass = m.getParameters()[0].getType();
 					registerExtender(m, parameterClass, extend.get());
 				} else {
-					LoggerService.getInstance().getLogger().severe("Error registering " + m.getDeclaringClass() + "#" + m.getName());
+					PantherLogger.getInstance().getLogger().severe("Error registering " + m.getDeclaringClass() + "#" + m.getName());
 				}
 			});
 		}
@@ -577,14 +577,14 @@ public abstract class Vent {
 				method.setAccessible(true);
 				return new CallInfo<>(true, retC.cast(method.invoke(listener, params)));
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				LoggerService.getInstance().getLogger().severe(refError);
+				PantherLogger.getInstance().getLogger().severe(refError);
 				if (e.getCause() != null) {
 					e.getCause().printStackTrace();
 				} else {
 					e.printStackTrace();
 				}
 			} catch (Exception e) {
-				LoggerService.getInstance().getLogger().severe(callError);
+				PantherLogger.getInstance().getLogger().severe(callError);
 				e.printStackTrace();
 			}
 			return new CallInfo<>(false, null);

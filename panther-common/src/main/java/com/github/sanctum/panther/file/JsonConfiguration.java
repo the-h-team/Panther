@@ -1,9 +1,8 @@
 package com.github.sanctum.panther.file;
 
 import com.github.sanctum.panther.util.EasyTypeAdapter;
-import com.github.sanctum.panther.util.LoggerService;
-import com.github.sanctum.panther.util.MapDecompressionService;
-import com.github.sanctum.panther.util.SimpleAsynchronousTask;
+import com.github.sanctum.panther.util.PantherLogger;
+import com.github.sanctum.panther.util.MapDecompression;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
@@ -121,7 +120,7 @@ public class JsonConfiguration extends Configurable {
 			writer.close();
 			return true;
 		} catch (Exception ex) {
-			LoggerService.getInstance().getLogger().severe("- An object of unknown origin was attempted to be saved and failed.");
+			PantherLogger.getInstance().getLogger().severe("- An object of unknown origin was attempted to be saved and failed.");
 			ex.printStackTrace();
 			return false;
 		}
@@ -241,7 +240,7 @@ public class JsonConfiguration extends Configurable {
 				}
 			}
 		} catch (ClassNotFoundException exception) {
-			LoggerService.getInstance().getLogger().severe("- An issue occurred while attempting to deserialize object " + type.getTypeName());
+			PantherLogger.getInstance().getLogger().severe("- An issue occurred while attempting to deserialize object " + type.getTypeName());
 			exception.printStackTrace();
 		}
 		return target;
@@ -315,7 +314,7 @@ public class JsonConfiguration extends Configurable {
 	public Set<String> getKeys(boolean deep) {
 		Set<String> keys;
 		if (deep) {
-			return MapDecompressionService.getInstance().decompress((Set<Map.Entry<String, Object>>)json.entrySet(), '.', null).toSet();
+			return MapDecompression.getInstance().decompress((Set<Map.Entry<String, Object>>)json.entrySet(), '.', null).toSet();
 		} else {
 			keys = new HashSet<>((Set<String>) json.keySet());
 		}
@@ -327,7 +326,7 @@ public class JsonConfiguration extends Configurable {
 	public Map<String, Object> getValues(boolean deep) {
 		Map<String, Object> map = new HashMap<>();
 		if (deep) {
-			return MapDecompressionService.getInstance().decompress((Set<Map.Entry<String, Object>>)json.entrySet(), '.', null).toMap();
+			return MapDecompression.getInstance().decompress((Set<Map.Entry<String, Object>>)json.entrySet(), '.', null).toMap();
 		} else {
 			json.entrySet().forEach(e -> {
 				Map.Entry<String, Object> entry = (Map.Entry<String, Object>)e;

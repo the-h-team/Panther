@@ -1,6 +1,6 @@
 package com.github.sanctum.panther.container;
 
-public final class LinkedArrays {
+public final class PantherArrays {
 
 	public static <T> PantherCollection<T> asList(T... t) {
 		PantherCollection<T> collection = new PantherList<>();

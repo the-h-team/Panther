@@ -6,10 +6,10 @@ import com.github.sanctum.panther.recursive.ServiceLoader;
 import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
-public final class LoggerService implements Service {
+public final class PantherLogger implements Service {
 
 	final Obligation obligation = () -> "To provide quick access to a global logger.";
-	Logger logger;
+	Logger logger = Logger.getLogger("Panther");
 
 	@Override
 	public @NotNull Obligation getObligation() {
@@ -24,11 +24,11 @@ public final class LoggerService implements Service {
 		this.logger = logger;
 	}
 
-	public static @NotNull LoggerService getInstance() {
-		LoggerService service = ServiceFactory.getInstance().getService(LoggerService.class);
+	public static @NotNull PantherLogger getInstance() {
+		PantherLogger service = ServiceFactory.getInstance().getService(PantherLogger.class);
 		if (service == null) {
-			ServiceLoader<LoggerService> loader = ServiceFactory.getInstance().newLoader(LoggerService.class);
-			loader.supply(new LoggerService());
+			ServiceLoader<PantherLogger> loader = ServiceFactory.getInstance().newLoader(PantherLogger.class);
+			loader.supply(new PantherLogger());
 			return loader.load();
 		}
 		return service;

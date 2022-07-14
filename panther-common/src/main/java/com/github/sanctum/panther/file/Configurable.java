@@ -1,8 +1,8 @@
 package com.github.sanctum.panther.file;
 
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
-import com.github.sanctum.panther.util.LoggerService;
-import com.github.sanctum.panther.util.MapDecompressionService;
+import com.github.sanctum.panther.util.PantherLogger;
+import com.github.sanctum.panther.util.MapDecompression;
 import com.github.sanctum.panther.util.OrdinalProcedure;
 import com.github.sanctum.panther.util.SimpleAsynchronousTask;
 import com.github.sanctum.panther.util.TypeAdapter;
@@ -76,7 +76,7 @@ public abstract class Configurable implements MemorySpace, Root {
 			} else
 				throw new InvalidJsonAdapterException("NodePointer annotation missing, JSON object serialization requires it.");
 		} catch (Exception e) {
-			LoggerService.getInstance().getLogger().severe("Class " + c.getSimpleName() + " failed to register JSON serialization handlers.");
+			PantherLogger.getInstance().getLogger().severe("Class " + c.getSimpleName() + " failed to register JSON serialization handlers.");
 			e.printStackTrace();
 		}
 	}
@@ -148,7 +148,7 @@ public abstract class Configurable implements MemorySpace, Root {
 			} else
 				throw new InvalidJsonAdapterException("NodePointer annotation missing, JSON object serialization requires it.");
 		} catch (Exception e) {
-			LoggerService.getInstance().getLogger().severe("Class " + c.getSimpleName() + " failed to register JSON serialization handlers.");
+			PantherLogger.getInstance().getLogger().severe("Class " + c.getSimpleName() + " failed to register JSON serialization handlers.");
 			e.printStackTrace();
 		}
 	}
@@ -698,7 +698,7 @@ public abstract class Configurable implements MemorySpace, Root {
 				try {
 					config.create();
 				} catch (IOException ex) {
-					LoggerService.getInstance().getLogger().severe("- An issue occurred while attempting to create the backing file for the '" + config.getName() + "' configuration.");
+					PantherLogger.getInstance().getLogger().severe("- An issue occurred while attempting to create the backing file for the '" + config.getName() + "' configuration.");
 					ex.printStackTrace();
 				}
 			}
@@ -750,7 +750,7 @@ public abstract class Configurable implements MemorySpace, Root {
 			if (config.get(this.key) instanceof Map) {
 				Map<String, Object> level1 = (Map<String, Object>) config.get(this.key);
 				if (deep) {
-					return MapDecompressionService.getInstance().decompress(level1.entrySet(), '.', null).toSet();
+					return MapDecompression.getInstance().decompress(level1.entrySet(), '.', null).toSet();
 				} else {
 					keys.addAll(level1.keySet());
 				}
@@ -766,7 +766,7 @@ public abstract class Configurable implements MemorySpace, Root {
 			if (config.get(this.key) instanceof Map) {
 				Map<String, Object> level1 = (Map<String, Object>) config.get(this.key);
 				if (deep) {
-					return MapDecompressionService.getInstance().decompress(level1.entrySet(), '.', null).toMap();
+					return MapDecompression.getInstance().decompress(level1.entrySet(), '.', null).toMap();
 				} else {
 					map.putAll(level1);
 				}

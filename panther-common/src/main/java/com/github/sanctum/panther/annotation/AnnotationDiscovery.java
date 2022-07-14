@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.annotation;
 
-import com.github.sanctum.panther.util.WideConsumer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -140,7 +140,7 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
 	 *
 	 * @param function The function.
 	 */
-	public void ifPresent(WideConsumer<T, Method> function) {
+	public void ifPresent(BiConsumer<T, Method> function) {
 		if (isPresent()) {
 			methods.forEach(m -> {
 				for (Annotation a : m.getAnnotations()) {
