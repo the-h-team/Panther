@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,9 @@ public class HFEncoded {
 	public byte[] toByteArray() {
 		try {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			ObjectOutputStream outputStream = this.output.getDeclaredConstructor(OutputStream.class).newInstance(output);
+			Constructor<? extends ObjectOutputStream> constructor = this.output.getDeclaredConstructor(OutputStream.class);
+			constructor.setAccessible(true);
+			ObjectOutputStream outputStream = constructor.newInstance(output);
 			outputStream.writeObject(obj);
 			outputStream.flush();
 			return output.toByteArray();
@@ -78,7 +81,9 @@ public class HFEncoded {
 	public String serialize() throws IllegalStateException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
-			ObjectOutputStream outputStream = this.output.getDeclaredConstructor(OutputStream.class).newInstance(output);
+			Constructor<? extends ObjectOutputStream> constructor = this.output.getDeclaredConstructor(OutputStream.class);
+			constructor.setAccessible(true);
+			ObjectOutputStream outputStream = constructor.newInstance(output);
 			outputStream.writeObject(obj);
 			outputStream.flush();
 		} catch (IOException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
@@ -103,7 +108,9 @@ public class HFEncoded {
 		ObjectInputStream inputStream = new ObjectInputStream(input);
 		if (this.input != null) {
 			try {
-				inputStream = this.input.getDeclaredConstructor(InputStream.class).newInstance(input);
+				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
+				constructor.setAccessible(true);
+				inputStream = constructor.newInstance(input);
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				throw new IllegalStateException("This should never happen", e);
 			}
@@ -129,7 +136,9 @@ public class HFEncoded {
 		ObjectInputStream inputStream = new ObjectInputStream(input);
 		if (this.input != null) {
 			try {
-				inputStream = this.input.getDeclaredConstructor(InputStream.class).newInstance(input);
+				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
+				constructor.setAccessible(true);
+				inputStream = constructor.newInstance(input);
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				throw new IllegalStateException("This should never happen", e);
 			}
@@ -157,7 +166,9 @@ public class HFEncoded {
 		ObjectInputStream inputStream = new ObjectInputStream(input);
 		if (this.input != null) {
 			try {
-				inputStream = this.input.getDeclaredConstructor(InputStream.class).newInstance(input);
+				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
+				constructor.setAccessible(true);
+				inputStream = constructor.newInstance(input);
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				throw new IllegalStateException("This should never happen", e);
 			}
@@ -187,7 +198,9 @@ public class HFEncoded {
 		ObjectInputStream inputStream = new ObjectInputStream(input);
 		if (this.input != null) {
 			try {
-				inputStream = this.input.getDeclaredConstructor(InputStream.class).newInstance(input);
+				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
+				constructor.setAccessible(true);
+				inputStream = constructor.newInstance(input);
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				throw new IllegalStateException("This should never happen", e);
 			}
@@ -210,7 +223,9 @@ public class HFEncoded {
 		ObjectInputStream inputStream = new ObjectInputStream(input);
 		if (this.input != null) {
 			try {
-				inputStream = this.input.getDeclaredConstructor(InputStream.class).newInstance(input);
+				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
+				constructor.setAccessible(true);
+				inputStream = constructor.newInstance(input);
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				throw new IllegalStateException("This should never happen", e);
 			}
@@ -239,7 +254,9 @@ public class HFEncoded {
 		ObjectInputStream inputStream = new ObjectInputStream(input);
 		if (this.input != null) {
 			try {
-				inputStream = this.input.getDeclaredConstructor(InputStream.class).newInstance(input);
+				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
+				constructor.setAccessible(true);
+				inputStream = constructor.newInstance(input);
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 				throw new IllegalStateException("This should never happen", e);
 			}
