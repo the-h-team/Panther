@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
+import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 public class HFEncoded {
 
 	private final Object obj;
-	Class<? extends ObjectOutputStream> output = ObjectOutputStream.class;
-	Class<? extends ObjectInputStream> input = ObjectInputStream.class;
 
 	/**
 	 * Convert the entire object into a string while retaining all of its values.
@@ -41,33 +40,24 @@ public class HFEncoded {
 		return new HFEncoded(obj);
 	}
 
-	@Voluntary("Set a custom output stream handler.")
-	public @NotNull HFEncoded setOutput(@NotNull Class<? extends ObjectOutputStream> clazz) {
-		this.output = clazz;
-		return this;
-	}
-
-	@Voluntary("Set a custom input stream handler.")
-	public @NotNull HFEncoded setInput(@NotNull Class<? extends ObjectInputStream> clazz) {
-		this.input = clazz;
-		return this;
-	}
-
 	/**
 	 * Convert the object into a byte array using base 64 encryption.
 	 *
 	 * @return The inputted object as a byte array
 	 */
-	public byte[] toByteArray() {
+	public byte[] toByteArray(@Nullable Function<ByteArrayOutputStream, ObjectOutputStream> function) {
 		try {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			Constructor<? extends ObjectOutputStream> constructor = this.output.getDeclaredConstructor(OutputStream.class);
-			constructor.setAccessible(true);
-			ObjectOutputStream outputStream = constructor.newInstance(output);
+			ObjectOutputStream outputStream;
+			if (function != null) {
+				outputStream = function.apply(output);
+			} else {
+				outputStream = new ObjectOutputStream(output);
+			}
 			outputStream.writeObject(obj);
 			outputStream.flush();
 			return output.toByteArray();
-		} catch (IOException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+		} catch (IOException e) {
 			throw new IllegalStateException("This should never happen", e);
 		}
 	}
@@ -78,15 +68,18 @@ public class HFEncoded {
 	 * @return a serialized, encoded form of this object with retained values
 	 * @throws IllegalStateException if unable to write the object
 	 */
-	public String serialize() throws IllegalStateException {
+	public String serialize(@Nullable Function<ByteArrayOutputStream, ObjectOutputStream> function) throws IllegalStateException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
-			Constructor<? extends ObjectOutputStream> constructor = this.output.getDeclaredConstructor(OutputStream.class);
-			constructor.setAccessible(true);
-			ObjectOutputStream outputStream = constructor.newInstance(output);
+			ObjectOutputStream outputStream;
+			if (function != null) {
+				outputStream = function.apply(output);
+			} else {
+				outputStream = new ObjectOutputStream(output);
+			}
 			outputStream.writeObject(obj);
 			outputStream.flush();
-		} catch (IOException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+		} catch (IOException e) {
 			throw new IllegalStateException("This should never happen", e);
 		}
 
@@ -101,19 +94,15 @@ public class HFEncoded {
 	 * @throws IOException            if an I/O error occurs while reading stream heade
 	 * @throws ClassNotFoundException if the class of the serialized object cannot be found
 	 */
-	public <T> T fromByteArray() throws IOException, ClassNotFoundException {
+	public <T> T fromByteArray(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function) throws IOException, ClassNotFoundException {
 		if (obj == null || !byte[].class.isAssignableFrom(obj.getClass())) return null;
 		byte[] ar = (byte[]) obj;
 		ByteArrayInputStream input = new ByteArrayInputStream(ar);
-		ObjectInputStream inputStream = new ObjectInputStream(input);
-		if (this.input != null) {
-			try {
-				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
-				constructor.setAccessible(true);
-				inputStream = constructor.newInstance(input);
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new IllegalStateException("This should never happen", e);
-			}
+		ObjectInputStream inputStream;
+		if (function != null) {
+			inputStream = function.apply(input);
+		} else {
+			inputStream = new ObjectInputStream(input);
 		}
 		return (T) inputStream.readObject();
 
@@ -130,18 +119,14 @@ public class HFEncoded {
 	 *                                to its original structure
 	 * @throws ClassNotFoundException if the class could not be located properly
 	 */
-	public Object deserialized(ClassLookup... lookups) throws IOException, ClassNotFoundException {
+	public Object deserialized(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function, ClassLookup... lookups) throws IOException, ClassNotFoundException {
 		byte[] serial = Base64.getDecoder().decode(obj.toString());
 		ByteArrayInputStream input = new ByteArrayInputStream(serial);
-		ObjectInputStream inputStream = new ObjectInputStream(input);
-		if (this.input != null) {
-			try {
-				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
-				constructor.setAccessible(true);
-				inputStream = constructor.newInstance(input);
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new IllegalStateException("This should never happen", e);
-			}
+		ObjectInputStream inputStream;
+		if (function != null) {
+			inputStream = function.apply(input);
+		} else {
+			inputStream = new ObjectInputStream(input);
 		}
 		for (ClassLookup l : lookups) {
 			if (inputStream instanceof ClassLookup.Input) {
@@ -159,19 +144,15 @@ public class HFEncoded {
 	 * @throws IOException            if an I/O error occurs while reading stream heade
 	 * @throws ClassNotFoundException if the class of the serialized object cannot be found
 	 */
-	public <T> T fromByteArray(ClassLookup... lookups) throws IOException, ClassNotFoundException {
+	public <T> T fromByteArray(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function, ClassLookup... lookups) throws IOException, ClassNotFoundException {
 		if (obj == null || !byte[].class.isAssignableFrom(obj.getClass())) return null;
 		byte[] ar = (byte[]) obj;
 		ByteArrayInputStream input = new ByteArrayInputStream(ar);
-		ObjectInputStream inputStream = new ObjectInputStream(input);
-		if (this.input != null) {
-			try {
-				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
-				constructor.setAccessible(true);
-				inputStream = constructor.newInstance(input);
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new IllegalStateException("This should never happen", e);
-			}
+		ObjectInputStream inputStream;
+		if (function != null) {
+			inputStream = function.apply(input);
+		} else {
+			inputStream = new ObjectInputStream(input);
 		}
 		for (ClassLookup l : lookups) {
 			if (inputStream instanceof ClassLookup.Input) {
@@ -192,18 +173,14 @@ public class HFEncoded {
 	 *                                to its original structure
 	 * @throws ClassNotFoundException if the class could not be located properly
 	 */
-	public Object deserialized() throws IOException, ClassNotFoundException {
+	public Object deserialized(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function) throws IOException, ClassNotFoundException {
 		byte[] serial = Base64.getDecoder().decode(obj.toString());
 		ByteArrayInputStream input = new ByteArrayInputStream(serial);
-		ObjectInputStream inputStream = new ObjectInputStream(input);
-		if (this.input != null) {
-			try {
-				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
-				constructor.setAccessible(true);
-				inputStream = constructor.newInstance(input);
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new IllegalStateException("This should never happen", e);
-			}
+		ObjectInputStream inputStream;
+		if (function != null) {
+			inputStream = function.apply(input);
+		} else {
+			inputStream = new ObjectInputStream(input);
 		}
 		return inputStream.readObject();
 	}
@@ -216,19 +193,15 @@ public class HFEncoded {
 	 * @throws IOException            if an I/O error occurs while reading stream heade
 	 * @throws ClassNotFoundException if the class of the serialized object cannot be found
 	 */
-	public <T> T fromByteArray(@NotNull ClassLoader classLoader) throws IOException, ClassNotFoundException {
+	public <T> T fromByteArray(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function, @NotNull ClassLoader classLoader) throws IOException, ClassNotFoundException {
 		if (obj == null || !byte[].class.isAssignableFrom(obj.getClass())) return null;
 		byte[] ar = (byte[]) obj;
 		ByteArrayInputStream input = new ByteArrayInputStream(ar);
-		ObjectInputStream inputStream = new ObjectInputStream(input);
-		if (this.input != null) {
-			try {
-				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
-				constructor.setAccessible(true);
-				inputStream = constructor.newInstance(input);
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new IllegalStateException("This should never happen", e);
-			}
+		ObjectInputStream inputStream;
+		if (function != null) {
+			inputStream = function.apply(input);
+		} else {
+			inputStream = new ObjectInputStream(input);
 		}
 		if (inputStream instanceof LoaderInput) {
 			((LoaderInput) inputStream).setLoader(classLoader);
@@ -248,18 +221,14 @@ public class HFEncoded {
 	 *                                to its original structure
 	 * @throws ClassNotFoundException if the class could not be located properly
 	 */
-	public Object deserialized(@NotNull ClassLoader classLoader) throws IOException, ClassNotFoundException {
+	public Object deserialized(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function, @NotNull ClassLoader classLoader) throws IOException, ClassNotFoundException {
 		byte[] serial = Base64.getDecoder().decode(obj.toString());
 		ByteArrayInputStream input = new ByteArrayInputStream(serial);
-		ObjectInputStream inputStream = new ObjectInputStream(input);
-		if (this.input != null) {
-			try {
-				Constructor<? extends ObjectInputStream> constructor = this.input.getDeclaredConstructor(InputStream.class);
-				constructor.setAccessible(true);
-				inputStream = constructor.newInstance(input);
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				throw new IllegalStateException("This should never happen", e);
-			}
+		ObjectInputStream inputStream;
+		if (function != null) {
+			inputStream = function.apply(input);
+		} else {
+			inputStream = new ObjectInputStream(input);
 		}
 		if (inputStream instanceof LoaderInput) {
 			((LoaderInput) inputStream).setLoader(classLoader);
@@ -276,9 +245,9 @@ public class HFEncoded {
 	 * @param <R>  the type this object represents
 	 * @return a deserialized object or null
 	 */
-	public <R> @Nullable R deserialize(@NotNull Class<R> type) {
+	public <R> @Nullable R deserialize(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function, @NotNull Class<R> type) {
 		try {
-			Object o = deserialized();
+			Object o = deserialized(function);
 			if (o == null) return null;
 			if (type.isAssignableFrom(o.getClass())) {
 				return (R) o;
@@ -301,9 +270,9 @@ public class HFEncoded {
 	 * @param <R>         the type this object represents
 	 * @return a deserialized object or null
 	 */
-	public <R> @Nullable R deserialize(@NotNull Class<R> type, @NotNull ClassLoader classLoader) {
+	public <R> @Nullable R deserialize(@Nullable Function<ByteArrayInputStream, ObjectInputStream> function, @NotNull Class<R> type, @NotNull ClassLoader classLoader) {
 		try {
-			Object o = deserialized(classLoader);
+			Object o = deserialized(function, classLoader);
 			if (o == null) return null;
 			if (type.isAssignableFrom(o.getClass())) {
 				return (R) o;
