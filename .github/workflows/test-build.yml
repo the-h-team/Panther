@@ -25,3 +25,5 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: Build sources and javadoc with Maven
+      run: mvn -B package -Psources-and-javadoc --file pom.xml
