@@ -77,7 +77,7 @@ public abstract class Task implements Applicable {
 		return this;
 	}
 
-	final void setFuture(@NotNull Future<?> future) {
+	public final void setFuture(@NotNull Future<?> future) {
 		this.future = future;
 	}
 
