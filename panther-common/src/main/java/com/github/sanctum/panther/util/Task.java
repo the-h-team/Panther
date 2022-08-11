@@ -72,6 +72,11 @@ public abstract class Task implements Applicable {
 		return this;
 	}
 
+	public final Task setChain(@NotNull TaskChain parent) {
+		this.parent = parent;
+		return this;
+	}
+
 	final void setFuture(@NotNull Future<?> future) {
 		this.future = future;
 	}
