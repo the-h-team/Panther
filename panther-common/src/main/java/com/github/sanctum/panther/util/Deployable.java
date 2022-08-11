@@ -2,7 +2,9 @@ package com.github.sanctum.panther.util;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -43,7 +45,6 @@ public interface Deployable<T> {
 	 *
 	 * @apiNote The calculation of "micro ticks" is simply milliseconds.
 	 * @see Deployable#queue(long)
-	 * @see Deployable#queue(Date)
 	 */
 	Deployable<T> queue();
 
@@ -51,17 +52,8 @@ public interface Deployable<T> {
 	 * Queue the relative meta data attached to this deployable to run after a specified interval.
 	 *
 	 * @param wait The amount of milliseconds to wait.
-	 * @see Deployable#queue(Date)
 	 */
 	Deployable<T> queue(long wait);
-
-	/**
-	 * Queue the relative meta data attached to this deployable to run @ a specific date.
-	 *
-	 * @param date The date to run the data.
-	 * @see Deployable#queue(long)
-	 */
-	Deployable<T> queue(@NotNull Date date);
 
 	/**
 	 * Queue the relative meta data attached to this deployable to run after a specified interval then apply
@@ -71,22 +63,8 @@ public interface Deployable<T> {
 	 * @param wait     The amount of milliseconds to wait.
 	 * @see Deployable#queue()
 	 * @see Deployable#queue(long)
-	 * @see Deployable#queue(Date)
 	 */
 	Deployable<T> queue(@NotNull Consumer<? super T> consumer, long wait);
-
-	/**
-	 * Queue the relative meta data attached to this deployable to run after a specified interval then apply
-	 * an additional operation using the sourced material.
-	 *
-	 * @param consumer The operation to run after the interval is reached.
-	 * @param date     The date to run the data.
-	 * @see Deployable#queue()
-	 * @see Deployable#queue(long)
-	 * @see Deployable#queue(Date)
-	 * @see Deployable#queue(Consumer, long)
-	 */
-	Deployable<T> queue(@NotNull Consumer<? super T> consumer, Date date);
 
 	/**
 	 * Map the provided source material into an object processor.
@@ -150,6 +128,208 @@ public interface Deployable<T> {
 	 */
 	default T orElseGet(Supplier<T> supplier) {
 		return Optional.ofNullable(get()).orElseGet(supplier);
+	}
+
+	/**
+	 * Create a new deployable instance using a runnable.
+	 *
+	 * @param data The runnable data
+	 * @param runtime the runtime to use for task scheduling.
+	 * @return A deployable runnable sequence.
+	 */
+	static @NotNull Deployable<Void> of(@NotNull Runnable data, int runtime) {
+		return new Deployable<Void>() {
+			final TaskChain taskChain = TaskChain.getChain(runtime);
+			@Override
+			public Deployable<Void> deploy() {
+				data.run();
+				return this;
+			}
+
+			@Override
+			public Deployable<Void> deploy(@NotNull Consumer<? super Void> consumer) {
+				deploy();
+				consumer.accept(null);
+				return this;
+			}
+
+			@Override
+			public Deployable<Void> queue() {
+				taskChain.run(this::deploy);
+				return this;
+			}
+
+			@Override
+			public Deployable<Void> queue(long wait) {
+				taskChain.wait(this::deploy, UUID.randomUUID().toString(), wait);
+				return this;
+			}
+
+			@Override
+			public Deployable<Void> queue(@NotNull Consumer<? super Void> consumer, long wait) {
+				taskChain.wait(() -> {
+					deploy();
+					consumer.accept(null);
+				}, UUID.randomUUID().toString(), wait);
+				return this;
+			}
+
+			@Override
+			public <O> DeployableMapping<O> map(@NotNull Function<? super Void, ? extends O> mapper) {
+				return null;
+			}
+
+			@Override
+			public CompletableFuture<Void> submit() {
+				return CompletableFuture.supplyAsync(() -> deploy().get());
+			}
+
+			@Override
+			public Void get() {
+				return null;
+			}
+		};
+	}
+
+
+	/**
+	 * Create a new deployable instance using a supplier.
+	 *
+	 * @param supplier The supplier of data
+	 * @param runtime the runtime to use for task scheduling.
+	 * @param <T> The type of object being worked with.
+	 * @return A deployable supplier sequence.
+	 */
+	static <T> @NotNull Deployable<T> of(@NotNull Supplier<T> supplier, int runtime) {
+		return new Deployable<T>() {
+			T element;
+			final TaskChain taskChain = TaskChain.getChain(runtime);
+			@Override
+			public Deployable<T> deploy() {
+				this.element = supplier.get();
+				return this;
+			}
+
+			@Override
+			public Deployable<T> deploy(@NotNull Consumer<? super T> consumer) {
+				deploy();
+				consumer.accept(element);
+				return this;
+			}
+
+			@Override
+			public Deployable<T> queue() {
+				try {
+					element = taskChain.submit(supplier::get).get();
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+				return this;
+			}
+
+			@Override
+			public Deployable<T> queue(long wait) {
+				try {
+					element = taskChain.submit(supplier::get, wait).get();
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+				return this;
+			}
+
+			@Override
+			public Deployable<T> queue(@NotNull Consumer<? super T> consumer, long wait) {
+				try {
+					element = taskChain.submit(() -> {
+						T t = supplier.get();
+						consumer.accept(t);
+						return t;
+					}, wait).get();
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+				return this;
+			}
+
+			@Override
+			public <O> DeployableMapping<O> map(@NotNull Function<? super T, ? extends O> mapper) {
+				return new DeployableMapping<>(taskChain, () -> element, (Function<? super Object, ? extends O>) mapper);
+			}
+
+			@Override
+			public CompletableFuture<T> submit() {
+				return CompletableFuture.supplyAsync(() -> deploy().get());
+			}
+
+			@Override
+			public T get() {
+				return Check.forNull(element, "Sequence not deployed, no object found.");
+			}
+		};
+	}
+
+	/**
+	 * Create a new deployable instance using an object instance and consumer.
+	 *
+	 * @param supplier The object to use modify.
+	 * @param operation The object modifier.
+	 * @param runtime The runtime to use for task scheduling.
+	 * @param <T> The type of object being worked with.
+	 * @return A deployable object modifying sequence.
+	 */
+	static <T> @NotNull Deployable<T> of(@NotNull T supplier, @NotNull Consumer<T> operation, int runtime) {
+		return new Deployable<T>() {
+			final T element = supplier;
+			final TaskChain taskChain = TaskChain.getChain(runtime);
+			@Override
+			public Deployable<T> deploy() {
+				operation.accept(element);
+				return this;
+			}
+
+			@Override
+			public Deployable<T> deploy(@NotNull Consumer<? super T> consumer) {
+				deploy();
+				consumer.accept(element);
+				return this;
+			}
+
+			@Override
+			public Deployable<T> queue() {
+				taskChain.run(this::deploy);
+				return this;
+			}
+
+			@Override
+			public Deployable<T> queue(long wait) {
+				taskChain.wait(this::deploy, UUID.randomUUID().toString(), wait);
+				return this;
+			}
+
+			@Override
+			public Deployable<T> queue(@NotNull Consumer<? super T> consumer, long wait) {
+				taskChain.wait(() -> {
+					deploy();
+					consumer.accept(element);
+				}, UUID.randomUUID().toString(), wait);
+				return this;
+			}
+
+			@Override
+			public <O> DeployableMapping<O> map(@NotNull Function<? super T, ? extends O> mapper) {
+				return new DeployableMapping<>(taskChain, () -> element, (Function<? super Object, ? extends O>) mapper);
+			}
+
+			@Override
+			public CompletableFuture<T> submit() {
+				return CompletableFuture.supplyAsync(() -> deploy().get());
+			}
+
+			@Override
+			public T get() {
+				return Check.forNull(element, "Sequence not deployed, no object found.");
+			}
+		};
 	}
 
 

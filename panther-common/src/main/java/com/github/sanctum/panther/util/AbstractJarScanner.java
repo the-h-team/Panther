@@ -1,5 +1,7 @@
 package com.github.sanctum.panther.util;
 
+import com.github.sanctum.panther.container.PantherCollection;
+import com.github.sanctum.panther.container.PantherList;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,16 +16,16 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractJarDocument implements Iterator<String> {
+public abstract class AbstractJarScanner implements Iterator<String> {
 
 	File file = null;
 	Scanner scanner = null;
 
-	protected AbstractJarDocument(@NotNull InputStream stream) {
+	protected AbstractJarScanner(@NotNull InputStream stream) {
 		initialize(stream);
 	}
 
-	public AbstractJarDocument(@NotNull JarFile file, @NotNull String entry) {
+	public AbstractJarScanner(@NotNull JarFile file, @NotNull String entry) throws IllegalStateException {
 		InputStream stream;
 		try {
 			JarEntry e = file.getJarEntry(entry);
@@ -31,7 +33,7 @@ public abstract class AbstractJarDocument implements Iterator<String> {
 				stream = file.getInputStream(e);
 			} else throw new IOException();
 		} catch (IOException e) {
-			throw new IllegalStateException("Jar entry " + entry + " not found.");
+			throw new IllegalStateException("Jar entry '" + entry + "' not found in file " + file.getName());
 		}
 		if (stream != null) initialize(stream);
 	}
@@ -77,4 +79,13 @@ public abstract class AbstractJarDocument implements Iterator<String> {
 	public @NotNull File toFile() {
 		return file;
 	}
+
+	public @NotNull String[] scan() {
+		PantherCollection<String> l = new PantherList<>();
+		do {
+			l.add(next());
+		} while (hasNext());
+		return l.stream().toArray(String[]::new);
+	}
+
 }

@@ -104,105 +104,99 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 	 * @return A deployable reordering operation.
 	 */
 	public Deployable<AbstractPaginatedCollection<T>> reorder() {
-		return new Deployable<AbstractPaginatedCollection<T>>() {
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> deploy() {
-				sorted = true;
-				Set<Page<T>> toAdd = new HashSet<>();
-				List<T> toSort = new ArrayList<>();
+		return Deployable.of(() -> {
+			sorted = true;
+			Set<Page<T>> toAdd = new HashSet<>();
+			List<T> toSort = new ArrayList<>();
 
-				if (predicate != null) {
-					toSort = collection.stream().filter(predicate).collect(Collectors.toList());
-				}
-				if (comparator != null) {
-					if (toSort.isEmpty()) {
-						toSort = collection.stream().sorted(comparator).collect(Collectors.toList());
-					} else {
-						toSort = toSort.stream().sorted(comparator).collect(Collectors.toList());
-					}
-				}
+			if (predicate != null) {
+				toSort = collection.stream().filter(predicate).collect(Collectors.toList());
+			}
+			if (comparator != null) {
 				if (toSort.isEmpty()) {
-					toSort = new ArrayList<>(collection);
+					toSort = collection.stream().sorted(comparator).collect(Collectors.toList());
+				} else {
+					toSort = toSort.stream().sorted(comparator).collect(Collectors.toList());
 				}
-				collection = toSort;
+			}
+			if (toSort.isEmpty()) {
+				toSort = new ArrayList<>(collection);
+			}
+			collection = toSort;
 
-				int totalPageCount = size();
-				for (int slot = 1; slot < totalPageCount + 1; slot++) {
-					int page = slot;
-					Page<T> newPage = new Page.Impl<>(AbstractPaginatedCollection.this, slot);
-					if (page <= totalPageCount) {
+			int totalPageCount = size();
+			for (int slot = 1; slot < totalPageCount + 1; slot++) {
+				int page = slot;
+				Page<T> newPage = new Page.Impl<>(AbstractPaginatedCollection.this, slot);
+				if (page <= totalPageCount) {
 
-						if (!toSort.isEmpty()) {
-							int placeholder = 0, index = 0;
-							page--;
-							for (T value : toSort) {
+					if (!toSort.isEmpty()) {
+						int placeholder = 0, index = 0;
+						page--;
+						for (T value : toSort) {
 
-								index++;
-								if ((((page * initialElementsPer) + placeholder + 1) == index) && (index != ((page * initialElementsPer) + initialElementsPer + 1))) {
-									placeholder++;
-									newPage.add(value);
-								}
+							index++;
+							if ((((page * initialElementsPer) + placeholder + 1) == index) && (index != ((page * initialElementsPer) + initialElementsPer + 1))) {
+								placeholder++;
+								newPage.add(value);
 							}
 						}
-						// end line
 					}
-					toAdd.add(newPage);
+					// end line
 				}
-				set.addAll(toAdd);
-				return this;
+				toAdd.add(newPage);
 			}
+			set.addAll(toAdd);
+			return this;
+		}, 0);
+	}
 
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> deploy(@NotNull Consumer<? super AbstractPaginatedCollection<T>> consumer) {
-				deploy();
-				consumer.accept(AbstractPaginatedCollection.this);
-				return this;
-			}
+	public Deployable<AbstractPaginatedCollection<T>> reorder(int runtime) {
+		return Deployable.of(() -> {
+			sorted = true;
+			Set<Page<T>> toAdd = new HashSet<>();
+			List<T> toSort = new ArrayList<>();
 
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> queue() {
-				return deploy();
+			if (predicate != null) {
+				toSort = collection.stream().filter(predicate).collect(Collectors.toList());
 			}
+			if (comparator != null) {
+				if (toSort.isEmpty()) {
+					toSort = collection.stream().sorted(comparator).collect(Collectors.toList());
+				} else {
+					toSort = toSort.stream().sorted(comparator).collect(Collectors.toList());
+				}
+			}
+			if (toSort.isEmpty()) {
+				toSort = new ArrayList<>(collection);
+			}
+			collection = toSort;
 
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> queue(long wait) {
-				SimpleAsynchronousTask.runLater(this::deploy, wait);
-				return this;
-			}
+			int totalPageCount = size();
+			for (int slot = 1; slot < totalPageCount + 1; slot++) {
+				int page = slot;
+				Page<T> newPage = new Page.Impl<>(AbstractPaginatedCollection.this, slot);
+				if (page <= totalPageCount) {
 
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> queue(@NotNull Date date) {
-				SimpleAsynchronousTask.runLater(this::deploy, date);
-				return this;
-			}
+					if (!toSort.isEmpty()) {
+						int placeholder = 0, index = 0;
+						page--;
+						for (T value : toSort) {
 
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> queue(@NotNull Consumer<? super AbstractPaginatedCollection<T>> consumer, long wait) {
-				SimpleAsynchronousTask.runLater(this::deploy, wait);
-				consumer.accept(AbstractPaginatedCollection.this);
-				return this;
+							index++;
+							if ((((page * initialElementsPer) + placeholder + 1) == index) && (index != ((page * initialElementsPer) + initialElementsPer + 1))) {
+								placeholder++;
+								newPage.add(value);
+							}
+						}
+					}
+					// end line
+				}
+				toAdd.add(newPage);
 			}
-
-			@Override
-			public Deployable<AbstractPaginatedCollection<T>> queue(@NotNull Consumer<? super AbstractPaginatedCollection<T>> consumer, Date date) {
-				SimpleAsynchronousTask.runLater(this::deploy, date);
-				consumer.accept(AbstractPaginatedCollection.this);
-				return this;
-			}
-
-			@Override
-			public <O> DeployableMapping<O> map(@NotNull Function<? super AbstractPaginatedCollection<T>, ? extends O> mapper) {
-				throw new IllegalStateException("Deployable mapping not supported.");
-			}
-
-			@Override
-			public CompletableFuture<AbstractPaginatedCollection<T>> submit() {
-				return CompletableFuture.supplyAsync(() -> {
-					deploy();
-					return AbstractPaginatedCollection.this;
-				});
-			}
-		};
+			set.addAll(toAdd);
+			return this;
+		}, runtime);
 	}
 
 	public @NotNull Set<Page<T>> getPages() {

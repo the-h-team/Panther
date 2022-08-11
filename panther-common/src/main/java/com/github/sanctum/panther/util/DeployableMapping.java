@@ -1,7 +1,6 @@
 package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.annotation.Comment;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -13,10 +12,12 @@ public final class DeployableMapping<R> implements Deployable<R> {
 
 	private final Function<? super Object, ? extends R> function;
 	private final Object parent;
+	private final TaskChain chain;
 	private R value;
 
-	DeployableMapping(@NotNull Supplier<Object> o, @NotNull Function<? super Object, ? extends R> function) {
+	DeployableMapping(@NotNull TaskChain chain, @NotNull Supplier<Object> o, @NotNull Function<? super Object, ? extends R> function) {
 		this.function = function;
+		this.chain = chain;
 		this.parent = o.get();
 	}
 
@@ -44,25 +45,19 @@ public final class DeployableMapping<R> implements Deployable<R> {
 
 	@Override
 	public DeployableMapping<R> queue() {
-		SimpleAsynchronousTask.runNow(this::deploy);
+		chain.run(this::deploy);
 		return this;
 	}
 
 	@Override
 	public DeployableMapping<R> queue(long wait) {
-		SimpleAsynchronousTask.runLater(this::queue, wait);
-		return this;
-	}
-
-	@Override
-	public DeployableMapping<R> queue(@NotNull Date date) {
-		SimpleAsynchronousTask.runLater(this::queue, date);
+		chain.wait(this::queue, wait);
 		return this;
 	}
 
 	@Override
 	public DeployableMapping<R> queue(@NotNull Consumer<? super R> consumer, long wait) {
-		SimpleAsynchronousTask.runLater(() -> {
+		chain.wait(() -> {
 			queue();
 			consumer.accept(this.value);
 		}, wait);
@@ -70,24 +65,12 @@ public final class DeployableMapping<R> implements Deployable<R> {
 	}
 
 	@Override
-	public DeployableMapping<R> queue(@NotNull Consumer<? super R> consumer, Date date) {
-		SimpleAsynchronousTask.runLater(() -> {
-			queue();
-			consumer.accept(this.value);
-		}, date);
-		return this;
-	}
-
-	@Override
 	public <O> DeployableMapping<O> map(@NotNull Function<? super R, ? extends O> mapper) {
-		return new DeployableMapping<>(() -> deploy().get(), (Function<? super Object, ? extends O>) mapper);
+		return new DeployableMapping<>(chain, () -> deploy().get(), (Function<? super Object, ? extends O>) mapper);
 	}
 
 	@Override
 	public CompletableFuture<R> submit() {
-		return CompletableFuture.supplyAsync(() -> {
-			deploy();
-			return this.value;
-		});
+		return CompletableFuture.supplyAsync(() -> deploy().get());
 	}
 }

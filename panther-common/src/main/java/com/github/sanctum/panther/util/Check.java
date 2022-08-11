@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.logging.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Check {
@@ -19,11 +20,11 @@ public class Check {
 	}
 
 	public static @Json
-	boolean isJson(String string) {
+	boolean isJson(@NotNull String string) {
 		return string.startsWith("{") || string.startsWith("[") && string.endsWith("{") || string.endsWith("[");
 	}
 
-	public static @Json String forJson(String string, String message) {
+	public static @Json String forJson(@NotNull String string, @NotNull String message) {
 		if (!isJson(string)) {
 			throw new IllegalArgumentException(message);
 		}
@@ -37,17 +38,17 @@ public class Check {
 		return true;
 	}
 
-	public static <T> T forNull(T t) {
+	public static <T> @NotNull T forNull(T t) {
 		if (t == null) throw new NullPointerException("Value cannot be null!");
 		return forWarnings(t);
 	}
 
-	public static <T> T forNull(T t, String message) {
+	public static <T> @NotNull T forNull(T t, String message) {
 		if (t == null) throw new NullPointerException(message);
 		return forWarnings(t);
 	}
 
-	public static <T> T forWarnings(T t) {
+	public static <T> @NotNull T forWarnings(T t) {
 		if (t == null) throw new IllegalArgumentException("Value cannot be null!");
 		AnnotationDiscovery<Experimental, Object> discovery = AnnotationDiscovery.of(Experimental.class, t);
 		discovery.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(Experimental.class)) || m.isAnnotationPresent(Experimental.class));
@@ -79,11 +80,11 @@ public class Check {
 		return t;
 	}
 
-	public static <A extends Annotation, T> T forAnnotation(T t, Class<A> annotative, AnnotationDiscovery.AnnotativeConsumer<A, Method, String> function) {
+	public static <A extends Annotation, T> @NotNull T forAnnotation(T t, Class<A> annotative, AnnotationDiscovery.AnnotativeConsumer<A, Method, String> function) {
 		return forAnnotation(t, annotative, function, false);
 	}
 
-	public static <A extends Annotation, T> T forAnnotation(T t, Class<A> annotative, AnnotationDiscovery.AnnotativeConsumer<A, Method, String> function, boolean warning) {
+	public static <A extends Annotation, T> @NotNull T forAnnotation(T t, Class<A> annotative, AnnotationDiscovery.AnnotativeConsumer<A, Method, String> function, boolean warning) {
 		if (t == null) throw new IllegalArgumentException("Value cannot be null!");
 		AnnotationDiscovery<A, Object> discovery = AnnotationDiscovery.of(annotative, t);
 		discovery.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(annotative)) || m.isAnnotationPresent(annotative));

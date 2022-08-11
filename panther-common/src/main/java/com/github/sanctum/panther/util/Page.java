@@ -143,73 +143,18 @@ public interface Page<T> extends Iterable<T> {
 
 		@Override
 		public Deployable<Page<T>> reorder() {
-			return new Deployable<Page<T>>() {
-				@Override
-				public Deployable<Page<T>> deploy() {
-					PantherCollection<T> copy = collection;
-					if (parent.predicate != null) {
-						copy = collection.stream().filter(parent.predicate).collect(PantherCollectors.toList());
-					}
-					if (parent.comparator != null) {
-						copy = copy.stream().sorted(parent.comparator).collect(PantherCollectors.toSet());
-					}
-					collection.clear();
-					collection = copy;
-					return this;
+			return Deployable.of(() -> {
+				PantherCollection<T> copy = collection;
+				if (parent.predicate != null) {
+					copy = collection.stream().filter(parent.predicate).collect(PantherCollectors.toList());
 				}
-
-				@Override
-				public Deployable<Page<T>> deploy(@NotNull Consumer<? super Page<T>> consumer) {
-					deploy();
-					consumer.accept(Impl.this);
-					return this;
+				if (parent.comparator != null) {
+					copy = copy.stream().sorted(parent.comparator).collect(PantherCollectors.toSet());
 				}
-
-				@Override
-				public Deployable<Page<T>> queue() {
-					return deploy();
-				}
-
-				@Override
-				public Deployable<Page<T>> queue(long wait) {
-					SimpleAsynchronousTask.runLater(this::deploy, wait);
-					return this;
-				}
-
-				@Override
-				public Deployable<Page<T>> queue(@NotNull Date date) {
-					SimpleAsynchronousTask.runLater(this::deploy, date);
-					return this;
-				}
-
-				@Override
-				public Deployable<Page<T>> queue(@NotNull Consumer<? super Page<T>> consumer, long wait) {
-					SimpleAsynchronousTask.runLater(this::deploy, wait);
-					consumer.accept(Impl.this);
-					return this;
-				}
-
-				@Override
-				public Deployable<Page<T>> queue(@NotNull Consumer<? super Page<T>> consumer, Date date) {
-					SimpleAsynchronousTask.runLater(this::deploy, date);
-					consumer.accept(Impl.this);
-					return this;
-				}
-
-				@Override
-				public <O> DeployableMapping<O> map(@NotNull Function<? super Page<T>, ? extends O> mapper) {
-					throw new IllegalStateException("Deployable mapping not supported.");
-				}
-
-				@Override
-				public CompletableFuture<Page<T>> submit() {
-					return CompletableFuture.supplyAsync(() -> {
-						deploy();
-						return Impl.this;
-					});
-				}
-
-			};
+				collection.clear();
+				collection = copy;
+				return this;
+			}, 0);
 		}
 
 	}

@@ -2,6 +2,7 @@ package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.annotation.Comment;
 import com.github.sanctum.panther.annotation.Experimental;
+import com.github.sanctum.panther.annotation.Voluntary;
 import com.github.sanctum.panther.container.ImmutablePantherMap;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherEntryMap;
@@ -17,6 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,13 +34,14 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 	protected final T mainClass;
 	protected ClassLoader bukkitHandler;
 
-	protected AbstractClassLoader(File file, ClassLoader parent, Object... args) throws IOException {
+	protected AbstractClassLoader(File file, ClassLoader parent, @Voluntary("Optional constructor arguments") Object... args) throws IOException {
 		this(file, null, parent, args);
 	}
 
 	protected AbstractClassLoader(@NotNull File file, @Nullable("Plugin class/instance or classloader.") Object bukkit, ClassLoader parent, Object... args) throws IOException {
 		super(new URL[]{file.toURI().toURL()}, parent);
-		Class<T> main = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
+		final Class<T> main = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
+		final Logger logger = PantherLogger.getInstance().getLogger();
 		final PantherMap<String, Class<?>> loadedClasses = new PantherEntryMap<>();
 		if (!file.isFile()) throw new IllegalArgumentException("The provided file is not a jar file!");
 		if (bukkit != null) setBukkitHandler(bukkit);
@@ -52,18 +55,18 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 					try {
 						resolvedClass = loadClass(s, true);
 					} catch (ClassNotFoundException e) {
-						PantherLogger.getInstance().getLogger().warning(() -> "Unable to inject '" + s + "'");
-						PantherLogger.getInstance().getLogger().warning(e::getMessage);
+						logger.warning(() -> "Unable to inject '" + s + "'");
+						logger.warning(e::getMessage);
 						return;
 					}
-					PantherLogger.getInstance().getLogger().finest(() -> "Loaded '" + s + "' successfully.");
+					logger.finest(() -> "Loaded '" + s + "' successfully.");
 					if (bukkit != null) {
 						getBukkitClassMap().put(s, resolvedClass);
 					}
 					loadedClasses.put(s, resolvedClass);
 				});
 		this.classes = loadedClasses;
-		if (main != Object.class) {
+		if (!Check.isNull(main) && !main.equals(Object.class)) {
 			try {
 				Class<? extends T> addonClass = loadedClasses.values().stream().filter(main::isAssignableFrom).findFirst().map(aClass -> (Class<? extends T>) aClass).get();
 				if (args != null && args.length > 0) {
