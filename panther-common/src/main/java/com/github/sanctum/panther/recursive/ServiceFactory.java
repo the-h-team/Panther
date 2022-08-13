@@ -51,7 +51,7 @@ public final class ServiceFactory implements ServiceManager {
 	@Override
 	public @NotNull ServiceLoader newLoader(@NotNull Class<?> clazz) {
 		if (services.containsKey(clazz)) return services.get(clazz);
-		if (!clazz.isAssignableFrom(Service.class)) {
+		if (!Service.class.isAssignableFrom(clazz)) {
 			if (!clazz.isAnnotationPresent(Service.Tag.class)) throw new NullPointerException("Not a known service, services require inheritance from the interface Service or needs a Service.Tag class annotation!");
 			Service.Tag r = clazz.getAnnotation(Service.Tag.class);
 			PantherLogger.getInstance().getLogger().finest("Registered new annotative service loader: {" + clazz.getName() + "}: " + "[" + '"' + r.value() + '"' + "]");
