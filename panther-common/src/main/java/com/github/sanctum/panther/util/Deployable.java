@@ -1,13 +1,12 @@
 package com.github.sanctum.panther.util;
 
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -140,9 +139,11 @@ public interface Deployable<T> {
 	static @NotNull Deployable<Void> of(@NotNull Runnable data, int runtime) {
 		return new Deployable<Void>() {
 			final TaskChain taskChain = TaskChain.getChain(runtime);
+			boolean deployed = false;
 			@Override
 			public Deployable<Void> deploy() {
 				data.run();
+				deployed = true;
 				return this;
 			}
 
@@ -185,8 +186,13 @@ public interface Deployable<T> {
 			}
 
 			@Override
+			public boolean isDeployed() {
+				return deployed;
+			}
+
+			@Override
 			public Void get() {
-				return null;
+				throw new NullPointerException("No return values used with runnable deployable sequences.");
 			}
 		};
 	}
@@ -219,35 +225,22 @@ public interface Deployable<T> {
 
 			@Override
 			public Deployable<T> queue() {
-				try {
-					element = taskChain.submit(supplier::get).get();
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
+				taskChain.run(this::deploy);
 				return this;
 			}
 
 			@Override
 			public Deployable<T> queue(long wait) {
-				try {
-					element = taskChain.submit(supplier::get, wait).get();
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
+				taskChain.wait(this::deploy, wait);
 				return this;
 			}
 
 			@Override
 			public Deployable<T> queue(@NotNull Consumer<? super T> consumer, long wait) {
-				try {
-					element = taskChain.submit(() -> {
-						T t = supplier.get();
-						consumer.accept(t);
-						return t;
-					}, wait).get();
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
+				taskChain.wait(() -> {
+					deploy();
+					consumer.accept(element);
+				}, wait);
 				return this;
 			}
 
@@ -262,7 +255,22 @@ public interface Deployable<T> {
 			}
 
 			@Override
+			public boolean isDeployed() {
+				return element != null;
+			}
+
+			@Override
 			public T get() {
+				if (!isDeployed()) {
+					deploy();
+					Logger logger = PantherLogger.getInstance().getLogger();
+					logger.warning("               !!![WARNING]!!!");
+					logger.warning("================================================");
+					logger.warning("Illegal sequence retrieval w/ element" + element);
+					logger.warning("The ability to do this will be removed in the future!" + element);
+					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!" + element);
+					logger.warning("================================================");
+				}
 				return Check.forNull(element, "Sequence not deployed, no object found.");
 			}
 		};
@@ -280,10 +288,12 @@ public interface Deployable<T> {
 	static <T> @NotNull Deployable<T> of(@NotNull T supplier, @NotNull Consumer<T> operation, int runtime) {
 		return new Deployable<T>() {
 			final T element = supplier;
+			boolean deployed = false;
 			final TaskChain taskChain = TaskChain.getChain(runtime);
 			@Override
 			public Deployable<T> deploy() {
 				operation.accept(element);
+				deployed = true;
 				return this;
 			}
 
@@ -326,8 +336,23 @@ public interface Deployable<T> {
 			}
 
 			@Override
+			public boolean isDeployed() {
+				return deployed;
+			}
+
+			@Override
 			public T get() {
-				return Check.forNull(element, "Sequence not deployed, no object found.");
+				if (!deployed) {
+					Logger logger = PantherLogger.getInstance().getLogger();
+					logger.warning("               !!![WARNING]!!!");
+					logger.warning("================================================");
+					logger.warning("Illegal sequence retrieval w/ element" + element);
+					logger.warning("The ability to do this will be removed in the future!" + element);
+					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!" + element);
+					logger.warning("================================================");
+					deploy();
+				}
+				return Check.forNull(element, "Sequence invalid or not deployed, no object found.");
 			}
 		};
 	}

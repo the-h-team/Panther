@@ -200,7 +200,7 @@ public abstract class VentMap implements Service {
 	public static @NotNull VentMap getInstance() {
 		VentMap instance = ServiceFactory.getInstance().getService(VentMap.class);
 		if (instance == null) {
-			ServiceLoader<VentMap> loader = ServiceFactory.getInstance().newLoader(VentMap.class).supply(new Default());
+			ServiceLoader loader = ServiceFactory.getInstance().newLoader(VentMap.class).supply(new Default());
 			return loader.load();
 		}
 		return instance;

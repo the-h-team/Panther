@@ -1,7 +1,7 @@
 package com.github.sanctum.panther;
 
+import com.github.sanctum.panther.container.PantherQueue;
 import com.github.sanctum.panther.event.Vent;
-import com.github.sanctum.panther.util.TaskChain;
 
 @Vent.Link.Key("Main class")
 public final class Test implements Vent.Host {
@@ -9,11 +9,19 @@ public final class Test implements Vent.Host {
 	Test() {
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
-		TaskChain chain = TaskChain.getAsynchronous();
+		PantherQueue<String> queue = new PantherQueue<>();
+		queue.add("Fart");
+		queue.add("Nugget");
+		queue.add("Cheese");
 
-		chain.run(() -> System.out.println("Hello"));
+		String c = queue.poll();
+		System.out.println(c);
+		String c2 = queue.poll();
+		System.out.println(c2);
+		String c3 = queue.poll();
+		System.out.println(c3);
 
 
 	}

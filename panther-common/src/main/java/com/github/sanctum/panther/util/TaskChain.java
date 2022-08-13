@@ -25,7 +25,7 @@ public abstract class TaskChain {
 
 			@Override
 			public @NotNull TaskChain run(final @NotNull Task task) {
-				task.parent = this;
+				task.setChain(this);
 				task.setFuture(defaultTimer.submit(task.setAsync(true)));
 				return this;
 			}
@@ -47,8 +47,8 @@ public abstract class TaskChain {
 
 			@Override
 			public @NotNull TaskChain wait(final @NotNull Task task, long delay) {
-				task.parent = this;
-				task.setFuture(defaultTimer.scheduleWithFixedDelay(task.setAsync(true), delay, delay, TimeUnit.MILLISECONDS));
+				task.setChain(this);
+				task.setFuture(defaultTimer.schedule(task.setAsync(true), delay, TimeUnit.MILLISECONDS));
 				if (task.getKey() != null) {
 					map.put(task.getKey(), task);
 				}
@@ -70,7 +70,7 @@ public abstract class TaskChain {
 						data.run();
 					}
 				};
-				task.setFuture(defaultTimer.scheduleWithFixedDelay(task.setAsync(true), delay, delay, TimeUnit.MILLISECONDS));
+				task.setFuture(defaultTimer.schedule(task.setAsync(true), delay, TimeUnit.MILLISECONDS));
 				if (task.getKey() != null) {
 					map.put(task.getKey(), task);
 				}

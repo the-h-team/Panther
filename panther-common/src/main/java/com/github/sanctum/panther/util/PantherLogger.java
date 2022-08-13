@@ -27,7 +27,7 @@ public final class PantherLogger implements Service {
 	public static @NotNull PantherLogger getInstance() {
 		PantherLogger service = ServiceFactory.getInstance().getService(PantherLogger.class);
 		if (service == null) {
-			ServiceLoader<PantherLogger> loader = ServiceFactory.getInstance().newLoader(PantherLogger.class);
+			ServiceLoader loader = ServiceFactory.getInstance().newLoader(PantherLogger.class);
 			loader.supply(new PantherLogger());
 			return loader.load();
 		}

@@ -1,43 +1,56 @@
 package com.github.sanctum.panther.recursive;
 
+import com.github.sanctum.panther.util.TypeAdapter;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @param <T>
+ * A container for instances on service objects.
  */
-public final class ServiceLoader<T extends Service> {
+public final class ServiceLoader {
 
-	final Class<T> classHandle;
-	Supplier<T> serviceSupplier;
-	T service;
+	final Class<?> classHandle;
+	Supplier<?> serviceSupplier;
+	Object service;
 
-	ServiceLoader(@NotNull Class<T> handle) {
+	public ServiceLoader(@NotNull Class<?> handle) {
 		this.classHandle = handle;
 	}
 
 	/**
-	 * @param service
-	 * @return
+	 * Supply an already instantiated service instance
+	 *
+	 * @param service the service to supply.
+	 * @return The same service loader instance.
 	 */
-	public ServiceLoader<T> supply(@NotNull T service) {
+	public <R> ServiceLoader supply(@NotNull R service) {
+		if (!classHandle.isAssignableFrom(service.getClass()))
+			throw new IllegalStateException("Class " + service.getClass().getSimpleName() + " does not inherit from " + classHandle.getSimpleName());
 		this.service = service;
 		return this;
 	}
 
 	/**
-	 * @param supplier
-	 * @return
+	 * Supply a service builder.
+	 *
+	 * @param supplier the supplier to use.
+	 * @return The same service loader instance.
 	 */
-	public ServiceLoader<T> supplyFresh(@NotNull Supplier<T> supplier) {
+	public <R> ServiceLoader supplyFresh(@NotNull Supplier<R> supplier) {
+		TypeAdapter<R> adapter = TypeAdapter.get();
+		if (!classHandle.isAssignableFrom(adapter.getType()))
+			throw new IllegalStateException("Class " + adapter.getType().getSimpleName() + " does not inherit from " + classHandle.getSimpleName());
 		this.serviceSupplier = supplier;
 		return this;
 	}
 
 	/**
-	 * @return
+	 * Load the cached service instance / builder instance.
+	 *
+	 * @return the cached service or null if not provided.
 	 */
-	public @NotNull("A service must be initialized!") T load() {
-		return service != null ? service : serviceSupplier.get();
+	public <R> @NotNull("A service must be initialized!") R load() {
+		Class<R> c = (Class<R>) classHandle;
+		return service != null ? c.cast(service) : c.cast(serviceSupplier.get());
 	}
 }

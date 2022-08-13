@@ -120,7 +120,7 @@ public final class MapDecompression implements Service {
 	public static @NotNull MapDecompression getInstance() {
 		MapDecompression service = ServiceFactory.getInstance().getService(MapDecompression.class);
 		if (service == null) {
-			ServiceLoader<MapDecompression> loader = ServiceFactory.getInstance().newLoader(MapDecompression.class);
+			ServiceLoader loader = ServiceFactory.getInstance().newLoader(MapDecompression.class);
 			loader.supply(new MapDecompression());
 			return loader.load();
 		}
