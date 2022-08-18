@@ -16,6 +16,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Read raw string data from any file type excluding directories.
+ */
 public abstract class AbstractJarScanner implements Iterator<String> {
 
 	File file = null;

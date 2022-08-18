@@ -7,8 +7,13 @@ import com.github.sanctum.panther.container.PantherSet;
 import com.github.sanctum.panther.recursive.Service;
 import com.github.sanctum.panther.recursive.ServiceFactory;
 import com.github.sanctum.panther.recursive.ServiceLoader;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +32,28 @@ public final class MapDecompression implements Service {
 
 	private String appendChild(String key, char divider, String text) {
 		return key != null ? key + divider + text : text;
+	}
+
+	public EntryMapper decompress(@NotNull Iterable<? extends Map.Entry<String, Object>> iterable, char divider) {
+		return decompress(iterable, divider, null);
+	}
+
+	public Map<String, Object> convert(@NotNull PantherMap<String, Object> map) {
+		Map<String, Object> m = new HashMap<>();
+		for (Map.Entry<String, Object> entry : map) {
+			if (entry.getValue() instanceof PantherMap) {
+				m.putAll(convert((PantherMap<String, Object>) entry.getValue()));
+			} else {
+				if (entry.getValue() instanceof PantherCollection) {
+					List<Object> list = new ArrayList<>();
+					((PantherCollection<?>)entry.getValue()).forEach(list::add);
+					m.put(entry.getKey(), list);
+				} else {
+					m.put(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+		return m;
 	}
 
 	public EntryMapper decompress(@NotNull Iterable<? extends Map.Entry<String, Object>> iterable, char divider, @Nullable String parentKey) {

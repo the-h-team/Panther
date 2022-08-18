@@ -1,28 +1,54 @@
 package com.github.sanctum.panther;
 
-import com.github.sanctum.panther.container.PantherQueue;
 import com.github.sanctum.panther.event.Vent;
+import com.github.sanctum.panther.file.JsonAdapter;
+import com.github.sanctum.panther.file.Node;
+import com.github.sanctum.panther.util.ResourceLookup;
+import com.github.sanctum.panther.util.TaskChain;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.util.Map;
 
 @Vent.Link.Key("Main class")
-public final class Test implements Vent.Host {
+@Node.Pointer("com.github.sanctum.Test")
+public final class Test implements JsonAdapter<Test> {
 
-	Test() {
+	String data;
+
+	public Test() {
+		this.data = "Borf";
 	}
 
-	public static void main(String[] args) throws InterruptedException {
+	Test(String d) {
+		this.data = d;
+	}
 
-		PantherQueue<String> queue = new PantherQueue<>();
-		queue.add("Fart");
-		queue.add("Nugget");
-		queue.add("Cheese");
+	public static void main(String[] args) throws Exception {
 
-		String c = queue.poll();
-		System.out.println(c);
-		String c2 = queue.poll();
-		System.out.println(c2);
-		String c3 = queue.poll();
-		System.out.println(c3);
+		ResourceLookup lookup = new ResourceLookup(Thread.currentThread().getContextClassLoader(), "com.github.sanctum");
+		TaskChain.getAsynchronous().wait(() -> {
+			Class<?> cl = lookup.getClasses().get(c -> c.getSimpleName().equals("TriadConsumer"));
+			System.out.println(cl.getName());
+			TaskChain.getAsynchronous().shutdown();
+		}, 500);
 
+	}
 
+	@Override
+	public JsonElement write(Test test) {
+		JsonObject o = new JsonObject();
+		o.addProperty("data", data);
+		return o;
+	}
+
+	@Override
+	public Test read(Map<String, Object> object) {
+		String d = object.get("data").toString();
+		return new Test(d);
+	}
+
+	@Override
+	public Class<? extends Test> getSerializationSignature() {
+		return Test.class;
 	}
 }

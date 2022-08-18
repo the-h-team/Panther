@@ -1,17 +1,25 @@
 package com.github.sanctum.panther.container;
 
+import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.annotation.Ordinal;
 import com.github.sanctum.panther.util.Task;
 import com.github.sanctum.panther.util.TaskChain;
 import java.util.Iterator;
+import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A set of elements linked in the order received, <strong>not</strong> allowing duplicate entries.
+ * A set of elements linked in the order received, allowing for duplicate entries.
+ *
+ * This type of collection is special, it responds well to new entries ONLY if the use case doesn't require constant traversing if this queue
+ * is being traversed it is considered blocked, meaning your modification will be scheduled for execution only once the queue is no longer blocked (when the queue isn't being actively traversed).
+ * Do not use this collection type if it will be constantly traversed as an unwanted side effect may be modifications never get a chance to execute, if you would like
+ * to still do this make sure you have a set period of time no shorter than 50 milliseconds between each execution on your own scheduling where the queue has a chance to catch up.
  *
  * @see PantherCollection
- * @param <E> The type of set this is
+ * @param <E> The type of element this queue is for
  */
+@Note("All queue modifications run on an in-daemon asynchronous task scheduler with an execution delay of 50 milliseconds.")
 public final class PantherQueue<E> extends PantherCollectionBase<E> {
 
 	final TaskChain chain = TaskChain.getAsynchronous();
@@ -31,6 +39,10 @@ public final class PantherQueue<E> extends PantherCollectionBase<E> {
 
 	public PantherQueue(Iterable<E> iterable, int capacity) {
 		super(iterable, capacity);
+	}
+
+	public E get(Predicate<? super E> matcher) {
+		return stream().filter(matcher).findFirst().orElse(null);
 	}
 
 	/**
@@ -81,20 +93,17 @@ public final class PantherQueue<E> extends PantherCollectionBase<E> {
 	 * This method is blocking and may wait to make sure the value is removed before passing.
 	 *
 	 * @return the oldest element in this queue.
-	 * @throws InterruptedException if processing removal could not be done.
 	 */
-	public E poll() throws InterruptedException {
+	public E poll() {
 		final E element = getFirst();
-		boolean blocked = true;
-		try {
+		if (element != null) {
+			boolean blocked = true;
 			do {
 				if (!isBlocked()) {
 					remove(element);
 					blocked = false;
 				}
 			} while (blocked);
-		} catch (Exception e) {
-			throw new InterruptedException("Unable to remove element from queue.");
 		}
 		return element;
 	}

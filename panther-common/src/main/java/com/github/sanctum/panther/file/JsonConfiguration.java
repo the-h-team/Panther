@@ -1,8 +1,10 @@
 package com.github.sanctum.panther.file;
 
+import com.github.sanctum.panther.container.PantherEntryMap;
+import com.github.sanctum.panther.container.PantherMap;
 import com.github.sanctum.panther.util.EasyTypeAdapter;
-import com.github.sanctum.panther.util.PantherLogger;
 import com.github.sanctum.panther.util.MapDecompression;
+import com.github.sanctum.panther.util.PantherLogger;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +40,7 @@ public class JsonConfiguration extends Configurable {
 	private final String name;
 	private final String directory;
 	// We use json simple because they inherit java collection types for easy casting.
+	protected PantherMap<String, Object> map;
 	protected JSONObject json;
 	private final JSONParser parser;
 
@@ -63,6 +66,7 @@ public class JsonConfiguration extends Configurable {
 				load(toRemove);
 			} catch (Exception ex) {
 				json = new JSONObject();
+				map = new PantherEntryMap<>();
 			}
 			if (toRemove.delete()) {
 				save();
@@ -72,6 +76,7 @@ public class JsonConfiguration extends Configurable {
 				load(file);
 			} catch (Exception ex) {
 				json = new JSONObject();
+				map = new PantherEntryMap<>();
 			}
 		}
 	}
@@ -83,6 +88,13 @@ public class JsonConfiguration extends Configurable {
 			json = (JSONObject) parser.parse(reader);
 			reader.close();
 			fileInputStream.close();
+			/*
+			StringBuilder builder = new StringBuilder();
+			while (scanner.hasNext()) {
+				builder.append(scanner.next());
+			}
+			this.map = JsonIntermediate.convertToPantherMap(JsonIntermediate.toJsonObject(builder.toString()));
+			 */
 			return true;
 		} else {
 			json = new JSONObject();
@@ -93,18 +105,13 @@ public class JsonConfiguration extends Configurable {
 	@Override
 	public void reload() {
 		try {
-			if (!file.exists()) {
+			if (!load(file)) {
 				PrintWriter writer = new PrintWriter(file, StandardCharsets.UTF_8.toString());
 				writer.print("{");
 				writer.print("}");
 				writer.flush();
 				writer.close();
 			}
-			FileInputStream fileInputStream = new FileInputStream(file);
-			InputStreamReader reader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
-			json = (JSONObject) parser.parse(reader);
-			reader.close();
-			fileInputStream.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -116,6 +123,7 @@ public class JsonConfiguration extends Configurable {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
 			Gson g = JsonAdapter.getJsonBuilder().setPrettyPrinting().disableHtmlEscaping().enableComplexMapKeySerialization().serializeNulls().serializeSpecialFloatingPointValues().create();
 			g.toJson(json, Map.class, writer);
+			//g.toJson(JsonIntermediate.toJsonObject(map), writer);
 			writer.flush();
 			writer.close();
 			return true;
@@ -247,7 +255,7 @@ public class JsonConfiguration extends Configurable {
 	}
 
 	@Override
-	protected Object get(String key) {
+	public Object get(String key) {
 		String[] a = key.split("\\.");
 		String k = a[Math.max(0, a.length - 1)];
 		JSONObject o = json;
@@ -269,7 +277,7 @@ public class JsonConfiguration extends Configurable {
 	}
 
 	@Override
-	protected <T> T get(String key, Class<T> type) {
+	public <T> T get(String key, Class<T> type) {
 		boolean stop = false;
 		Object ob = null;
 		String[] a = key.split("\\.");
@@ -314,7 +322,7 @@ public class JsonConfiguration extends Configurable {
 	public Set<String> getKeys(boolean deep) {
 		Set<String> keys;
 		if (deep) {
-			return MapDecompression.getInstance().decompress((Set<Map.Entry<String, Object>>)json.entrySet(), '.', null).toSet();
+			return MapDecompression.getInstance().decompress((Set<Map.Entry<String, Object>>) json.entrySet(), '.', null).toSet();
 		} else {
 			keys = new HashSet<>((Set<String>) json.keySet());
 		}
@@ -326,10 +334,10 @@ public class JsonConfiguration extends Configurable {
 	public Map<String, Object> getValues(boolean deep) {
 		Map<String, Object> map = new HashMap<>();
 		if (deep) {
-			return MapDecompression.getInstance().decompress((Set<Map.Entry<String, Object>>)json.entrySet(), '.', null).toMap();
+			return MapDecompression.getInstance().decompress((Set<Map.Entry<String, Object>>) json.entrySet(), '.', null).toMap();
 		} else {
 			json.entrySet().forEach(e -> {
-				Map.Entry<String, Object> entry = (Map.Entry<String, Object>)e;
+				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) e;
 				map.put(entry.getKey(), entry.getValue());
 			});
 		}

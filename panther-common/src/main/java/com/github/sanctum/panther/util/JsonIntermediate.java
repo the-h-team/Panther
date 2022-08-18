@@ -2,6 +2,10 @@ package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
 import com.github.sanctum.panther.annotation.Json;
+import com.github.sanctum.panther.container.PantherCollection;
+import com.github.sanctum.panther.container.PantherEntryMap;
+import com.github.sanctum.panther.container.PantherList;
+import com.github.sanctum.panther.container.PantherMap;
 import com.github.sanctum.panther.file.JsonAdapter;
 import com.github.sanctum.panther.file.Node;
 import com.google.gson.JsonArray;
@@ -109,6 +113,26 @@ public interface JsonIntermediate {
 					object.addProperty(entry.getKey(), (Long) entry.getValue());
 				} else if (entry.getValue() instanceof Double) {
 					object.addProperty(entry.getKey(), (Double) entry.getValue());
+				} else if (entry.getValue() instanceof Map) {
+					object.add(entry.getKey(), toJsonObject(entry.getValue()));
+				}
+			}
+			return object;
+		}
+		if (o instanceof PantherMap) {
+			for (Map.Entry<String, Object> entry : ((PantherMap<String, Object>) o).entries()) {
+				if (entry.getValue() instanceof String) {
+					object.addProperty(entry.getKey(), (String) entry.getValue());
+				} else if (entry.getValue() instanceof Integer) {
+					object.addProperty(entry.getKey(), (Integer) entry.getValue());
+				} else if (entry.getValue() instanceof Float) {
+					object.addProperty(entry.getKey(), (Float) entry.getValue());
+				} else if (entry.getValue() instanceof Long) {
+					object.addProperty(entry.getKey(), (Long) entry.getValue());
+				} else if (entry.getValue() instanceof Double) {
+					object.addProperty(entry.getKey(), (Double) entry.getValue());
+				} else if (entry.getValue() instanceof PantherMap) {
+					object.add(entry.getKey(), toJsonObject(entry.getValue()));
 				}
 			}
 			return object;
@@ -187,7 +211,7 @@ public interface JsonIntermediate {
 				return object;
 			}
 			return parent;
-		} else throw new NullPointerException("Class " + o.getClass() + " doesn't contain any json keys.");
+		} else throw new NullPointerException(o.getClass() + " doesn't contain any json keys.");
 	}
 
 	/**
@@ -235,6 +259,37 @@ public interface JsonIntermediate {
 	}
 
 	/**
+	 * Convert a json array to a list of objects, json objects convert to other maps and json arrays convert to other lists.
+	 *
+	 * @param array The json array to use.
+	 * @return A list of objects.
+	 */
+	static PantherCollection<Object> convertToPantherList(JsonArray array) {
+		PantherCollection<Object> list = new PantherList<>();
+		for (JsonElement element : array) {
+			if (element.isJsonObject()) {
+				list.add(convertToPantherMap(element.getAsJsonObject()));
+			}
+			if (element.isJsonArray()) {
+				list.add(convertToPantherList(element.getAsJsonArray()));
+			}
+			if (element.isJsonPrimitive()) {
+				JsonPrimitive primitive = element.getAsJsonPrimitive();
+				if (primitive.isBoolean()) {
+					list.add(primitive.getAsBoolean());
+				}
+				if (primitive.isNumber()) {
+					list.add(primitive.getAsNumber());
+				}
+				if (primitive.isString()) {
+					list.add(primitive.getAsString());
+				}
+			}
+		}
+		return list;
+	}
+
+	/**
 	 * Convert a json object into a map of keyed values, json objects convert to other maps and json arrays convert to other lists.
 	 *
 	 * @param object The json object to use.
@@ -248,6 +303,37 @@ public interface JsonIntermediate {
 			}
 			if (entry.getValue().isJsonArray()) {
 				map.put(entry.getKey(), convertToList(entry.getValue().getAsJsonArray()));
+			}
+			if (entry.getValue().isJsonPrimitive()) {
+				JsonPrimitive primitive = entry.getValue().getAsJsonPrimitive();
+				if (primitive.isBoolean()) {
+					map.put(entry.getKey(), primitive.getAsBoolean());
+				}
+				if (primitive.isNumber()) {
+					map.put(entry.getKey(), primitive.getAsNumber());
+				}
+				if (primitive.isString()) {
+					map.put(entry.getKey(), primitive.getAsString());
+				}
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * Convert a json object into a map of keyed values, json objects convert to other maps and json arrays convert to other lists.
+	 *
+	 * @param object The json object to use.
+	 * @return A map of keyed values.
+	 */
+	static PantherMap<String, Object> convertToPantherMap(JsonObject object) {
+		PantherMap<String, Object> map = new PantherEntryMap<>();
+		for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+			if (entry.getValue().isJsonObject()) {
+				map.put(entry.getKey(), convertToPantherMap(entry.getValue().getAsJsonObject()));
+			}
+			if (entry.getValue().isJsonArray()) {
+				map.put(entry.getKey(), convertToPantherList(entry.getValue().getAsJsonArray()));
 			}
 			if (entry.getValue().isJsonPrimitive()) {
 				JsonPrimitive primitive = entry.getValue().getAsJsonPrimitive();

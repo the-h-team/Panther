@@ -1,5 +1,7 @@
 package com.github.sanctum.panther.container;
 
+import java.lang.reflect.Array;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -89,6 +91,31 @@ public interface PantherCollection<K> extends Iterable<K> {
 	 */
 	default boolean isEmpty() {
 		return size() <= 0;
+	}
+
+	/**
+	 * Convert this collection into an array of generic type.
+	 *
+	 * @param a a dummy array used only to specify type
+	 * @param <T> The type of array for reference.
+	 * @return an array containing all elements from this collection in order.
+	 */
+	default <T> @NotNull T[] toArray(T[] a) {
+		T[] copy = (T[]) Array.newInstance(a.getClass().getComponentType(), size());
+		for (int i = 0; i < size(); i++) {
+			copy[i] = (T) get(i);
+		}
+		return copy;
+	}
+
+	/**
+	 * Convert this collection into an array of generic type.
+	 *
+	 * @param a a dummy array used only to specify type for creation
+	 * @return an array containing all elements from this collection in order.
+	 */
+	default @NotNull K[] toArray(IntFunction<K[]> a) {
+		return stream().toArray(a);
 	}
 
 	/**

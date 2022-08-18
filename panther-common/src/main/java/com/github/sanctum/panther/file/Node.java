@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An object that encapsulates data storage services.
@@ -31,6 +32,16 @@ public interface Node extends Root, MemorySpace {
 	 * @return The primitive object parser for this node.
 	 */
 	Primitive toPrimitive();
+
+	/**
+	 * If the following node represents that of an object not another node
+	 * use this method to parse information in the case of generic data.
+	 *
+	 * @param clazz The generic processing class to use.
+	 * @param <T> The generic processor type
+	 * @return The generic object parser for this nodes configurable.
+	 */
+	<T extends Generic> T toGeneric(@NotNull Class<T> clazz);
 
 	/**
 	 * If the result of this node ends in an object instead of another node parse its type here.

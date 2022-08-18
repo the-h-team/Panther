@@ -1,5 +1,7 @@
 package com.github.sanctum.panther.file;
 
+import com.github.sanctum.panther.container.PantherMap;
+import com.github.sanctum.panther.util.MapDecompression;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import java.util.Map;
@@ -30,6 +32,15 @@ public interface JsonAdapter<T> {
 	 * @return The deserialized object.
 	 */
 	T read(Map<String, Object> object);
+
+	/**
+	 * @see JsonAdapter#read(Map)
+	 * Delegate usage of a panther map to translation.
+	 */
+	default T read(PantherMap<String, Object> object) {
+		Map<String, Object> map = MapDecompression.getInstance().convert(object);
+		return read(map);
+	}
 
 	/**
 	 * Get the type of class this adapter works with.

@@ -1,6 +1,9 @@
 package com.github.sanctum.panther.file;
 
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
+import com.github.sanctum.panther.container.PantherCollection;
+import com.github.sanctum.panther.container.PantherEntryMap;
+import com.github.sanctum.panther.container.PantherMap;
 import com.github.sanctum.panther.util.PantherLogger;
 import com.github.sanctum.panther.util.MapDecompression;
 import com.github.sanctum.panther.util.OrdinalProcedure;
@@ -30,6 +33,7 @@ public abstract class Configurable implements MemorySpace, Root {
 
 	protected static final Map<String, JsonAdapterInput<?>> serializers = new HashMap<>();
 	protected final Map<String, MemorySpace> memory = new HashMap<>();
+	protected final PantherMap<Class<?>, Generic> processors = new PantherEntryMap<>();
 
 	/**
 	 * Register a json element adapter for automatic use with json data usage.
@@ -169,10 +173,33 @@ public abstract class Configurable implements MemorySpace, Root {
 		return serializers.values().stream().filter(jsonAdapterInput -> pointer.equals(OrdinalProcedure.select(jsonAdapterInput, 24).cast(TypeAdapter.STRING))).map(c -> (JsonAdapter<V>) c).findFirst().orElse(null);
 	}
 
+	/**
+	 * @param processor
+	 */
+	public final void register(@NotNull Generic processor) {
+		this.processors.put(processor.getClass(), processor);
+	}
 
-	protected abstract Object get(String key);
+	/**
+	 * @param processor
+	 */
+	public final void unregister(@NotNull Generic processor) {
+		this.processors.remove(processor.getClass());
+	}
 
-	protected abstract <T> T get(String key, Class<T> type);
+	/**
+	 * @param key
+	 * @return
+	 */
+	public abstract Object get(String key);
+
+	/**
+	 * @param key
+	 * @param type
+	 * @param <T>
+	 * @return
+	 */
+	public abstract <T> T get(String key, Class<T> type);
 
 	/**
 	 * Store an object under a specified path. Any current relative information to the path will be over-written.
@@ -535,6 +562,16 @@ public abstract class Configurable implements MemorySpace, Root {
 		@Override
 		public Primitive toPrimitive() {
 			return this;
+		}
+
+		@Override
+		public <T extends Generic> T toGeneric(@NotNull Class<T> clazz) {
+			T gen = (T) config.processors.get(clazz);
+			if (gen != null) {
+				OrdinalProcedure.of(gen).get(20, this).get();
+				return gen;
+			}
+			throw new NullPointerException(clazz + " does not have a registered instance within this configurable!");
 		}
 
 		@Override

@@ -266,9 +266,9 @@ public interface Deployable<T> {
 					Logger logger = PantherLogger.getInstance().getLogger();
 					logger.warning("               !!![WARNING]!!!");
 					logger.warning("================================================");
-					logger.warning("Illegal sequence retrieval w/ element" + element);
-					logger.warning("The ability to do this will be removed in the future!" + element);
-					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!" + element);
+					logger.warning("Illegal sequence retrieval w/ element " + element);
+					logger.warning("The ability to do this will be removed in the future!");
+					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!");
 					logger.warning("================================================");
 				}
 				return Check.forNull(element, "Sequence not deployed, no object found.");
@@ -346,9 +346,9 @@ public interface Deployable<T> {
 					Logger logger = PantherLogger.getInstance().getLogger();
 					logger.warning("               !!![WARNING]!!!");
 					logger.warning("================================================");
-					logger.warning("Illegal sequence retrieval w/ element" + element);
-					logger.warning("The ability to do this will be removed in the future!" + element);
-					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!" + element);
+					logger.warning("Illegal sequence retrieval w/ element " + element);
+					logger.warning("The ability to do this will be removed in the future!");
+					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!");
 					logger.warning("================================================");
 					deploy();
 				}

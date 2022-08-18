@@ -1,8 +1,5 @@
 package com.github.sanctum.panther.container;
 
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -159,24 +156,6 @@ public abstract class PantherCollectionBase<E> implements PantherCollection<E> {
 		head = null;
 		tail = null;
 		size = -1;
-	}
-
-	public Object[] toArray() {
-		Class<E> magic = (Class<E>) new TypeToken<E>(){}.getRawType();
-		Object[] ar = (Object[]) Array.newInstance(magic, size());
-		for (int i = 0; i < ar.length; i++) {
-			ar[i] = get(i);
-		}
-		return ar;
-	}
-
-	public <R> R[] toArray(R[] r) {
-		if (r.length < size)
-			return (R[]) Arrays.copyOf(toArray(), size, r.getClass());
-		System.arraycopy(toArray(), 0, r, 0, size);
-		if (r.length > size)
-			r[size] = null;
-		return r;
 	}
 
 	@NotNull
