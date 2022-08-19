@@ -77,6 +77,13 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
 		return new AnnotationDiscovery<>(c, listener);
 	}
 
+	/**
+	 * Filter the methods and only work with ones of interest.
+	 * ~~WARNING~~ Overwrites the method collection and doesn't test accessibility, use {@link AnnotationDiscovery#filter(Predicate)} first.
+	 *
+	 * @param comparator The comparator to use.
+	 * @return The same annotation discovery object.
+	 */
 	public AnnotationDiscovery<T, R> sort(Comparator<? super Method> comparator) {
 		this.methods = methods.stream().sorted(comparator).collect(Collectors.toCollection(LinkedHashSet::new));
 		return this;

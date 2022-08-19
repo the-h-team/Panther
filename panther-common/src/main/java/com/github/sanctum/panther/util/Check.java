@@ -50,21 +50,21 @@ public class Check {
 
 	public static <T> @NotNull T forWarnings(T t) {
 		if (t == null) throw new IllegalArgumentException("Value cannot be null!");
-		AnnotationDiscovery<Experimental, Object> discovery = AnnotationDiscovery.of(Experimental.class, t);
-		discovery.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(Experimental.class)) || m.isAnnotationPresent(Experimental.class));
-		AnnotationDiscovery<Note, Object> discovery2 = AnnotationDiscovery.of(Note.class, t);
-		discovery2.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(Note.class)) || m.isAnnotationPresent(Note.class));
+		AnnotationDiscovery<Experimental, Object> experimentalAnnotationDiscovery = AnnotationDiscovery.of(Experimental.class, t);
+		experimentalAnnotationDiscovery.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(Experimental.class)) || m.isAnnotationPresent(Experimental.class));
+		AnnotationDiscovery<Note, Object> noteAnnotationDiscovery = AnnotationDiscovery.of(Note.class, t);
+		noteAnnotationDiscovery.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(Note.class)) || m.isAnnotationPresent(Note.class));
 		Logger message = PantherLogger.getInstance().getLogger();
-		if (discovery.isPresent()) {
-			message.warning("- Warning scan found (" + discovery.count() + ") methods at checkout for object '" + t.getClass().getSimpleName() + "'");
+		if (experimentalAnnotationDiscovery.isPresent()) {
+			message.warning("- Warning scan found (" + experimentalAnnotationDiscovery.count() + ") methods at checkout for object '" + t.getClass().getSimpleName() + "'");
 			if (t.getClass().isAnnotationPresent(Experimental.class)) {
 				Experimental e = t.getClass().getAnnotation(Experimental.class);
 				message.warning("- Entire class " + t.getClass().getSimpleName() + " found with warning '" + e.dueTo() + "'");
 			}
-			discovery.ifPresent((r, m) -> {
+			experimentalAnnotationDiscovery.ifPresent((r, m) -> {
 				message.warning("- Method " + m.getName() + " found with warning '" + r.dueTo() + "'");
 			});
-			discovery2.ifPresent((r, m) -> {
+			noteAnnotationDiscovery.ifPresent((r, m) -> {
 				message.info("- Method " + m.getName() + " found with note '" + r.value() + "'");
 			});
 		} else {

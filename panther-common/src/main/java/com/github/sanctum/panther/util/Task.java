@@ -108,6 +108,7 @@ public abstract class Task implements Applicable {
 		return flag.cast(this);
 	}
 
+	@Note("This method only responds true if your class is annotated with a delay period of execution.")
 	public final boolean isRepeatable() {
 		return getClass().isAnnotationPresent(Period.class);
 	}

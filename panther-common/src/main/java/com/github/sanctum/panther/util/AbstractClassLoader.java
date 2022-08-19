@@ -140,6 +140,25 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 	}
 
 	/**
+	 * Get a resource lookup for this class loader.
+	 *
+	 * @return a resource lookup object
+	 */
+	public ResourceLookup getLookup() {
+		return new ResourceLookup(this);
+	}
+
+	/**
+	 * Get a resource lookup for this class loader.
+	 *
+	 * @param packageName the package name to check
+	 * @return a resource lookup object
+	 */
+	public ResourceLookup getLookup(@NotNull String packageName) {
+		return new ResourceLookup(this, packageName);
+	}
+
+	/**
 	 * Unload a class from memory. If the provided class is not found an exception will occur, if the provided string results in a path
 	 * this method will switch in an attempt at locating and removing the relative class files it belongs to.
 	 *
