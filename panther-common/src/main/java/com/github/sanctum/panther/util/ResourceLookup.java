@@ -7,6 +7,7 @@ import com.github.sanctum.panther.container.PantherQueue;
 import com.github.sanctum.panther.container.PantherSet;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.TreeSet;
@@ -65,9 +66,17 @@ public class ResourceLookup {
 
 	public static @NotNull("Unable to locate minecraft class loader!") ResourceLookup getMinecraft() {
 		try {
-			Class<?> minecraftServerClass = Class.forName("net.minecraft.server.MinecraftServer");
-			return new ResourceLookup(minecraftServerClass.getClassLoader(), "net.minecraft");
-		} catch (ClassNotFoundException e) {
+			Class<?> clazz = Class.forName("org.bukkit.Bukkit").getMethod("getServer").invoke(null).getClass();
+			String name = clazz.getPackage().getName();
+			String version = name.substring(name.lastIndexOf('.') + 1) + ".";
+			String clazzName = "net.minecraft.server." + version + "";
+			if (version.contains("1.17") || version.contains("1.18") || version.contains("1.19")) {
+				clazzName = "net.minecraft.world.item.ItemStack";
+			}
+			Class<?> minecraftClass = Class.forName(clazzName);
+			// pull classloader from itemstack class
+			return new ResourceLookup(minecraftClass.getClassLoader(), "net.minecraft");
+		} catch (InvocationTargetException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException e) {
 			throw new NullPointerException(e.getMessage());
 		}
 	}
