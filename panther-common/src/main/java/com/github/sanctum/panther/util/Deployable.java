@@ -209,10 +209,12 @@ public interface Deployable<T> {
 	static <T> @NotNull Deployable<T> of(@NotNull Supplier<T> supplier, int runtime) {
 		return new Deployable<T>() {
 			T element;
+			boolean deployed = false;
 			final TaskChain taskChain = TaskChain.getChain(runtime);
 			@Override
 			public Deployable<T> deploy() {
 				this.element = supplier.get();
+				this.deployed = true;
 				return this;
 			}
 
@@ -256,7 +258,7 @@ public interface Deployable<T> {
 
 			@Override
 			public boolean isDeployed() {
-				return element != null;
+				return deployed;
 			}
 
 			@Override
@@ -271,7 +273,7 @@ public interface Deployable<T> {
 					logger.warning("Make the subsequent calls to 'deploy' or 'queue' while processing deployables!");
 					logger.warning("================================================");
 				}
-				return Check.forNull(element, "Sequence not deployed, no object found.");
+				return isDeployed() ? element : Check.forNull(element, "Sequence not deployed, no object found.");
 			}
 		};
 	}
@@ -352,7 +354,7 @@ public interface Deployable<T> {
 					logger.warning("================================================");
 					deploy();
 				}
-				return Check.forNull(element, "Sequence invalid or not deployed, no object found.");
+				return isDeployed() ? element : Check.forNull(element, "Sequence invalid or not deployed, no object found.");
 			}
 		};
 	}
