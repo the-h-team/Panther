@@ -47,8 +47,8 @@ afterEvaluate {
                     }
                     scm {
                         connection.set("scm:git:git://github.com/the-h-team/Panther.git")
-                        developerConnection.set("scm:git:ssh://github.com/the-h-team/Panther")
-                        url.set(project.properties["url"] as String)
+                        developerConnection.set("scm:git:ssh://github.com/the-h-team/Panther.git")
+                        url.set("https://github.com/the-h-team/Panther/tree/master")
                     }
                 }
                 from(components["java"])
