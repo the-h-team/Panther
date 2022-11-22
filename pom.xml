@@ -7,7 +7,7 @@
     <groupId>com.github.the-h-team</groupId>
     <artifactId>panther</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1.R1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <modules>
         <module>panther-placeholders</module>
         <module>panther-containers</module>

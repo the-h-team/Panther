@@ -3,8 +3,7 @@ package com.github.sanctum.panther;
 import com.github.sanctum.panther.event.Vent;
 import com.github.sanctum.panther.file.JsonAdapter;
 import com.github.sanctum.panther.file.Node;
-import com.github.sanctum.panther.util.ResourceLookup;
-import com.github.sanctum.panther.util.TaskChain;
+import com.github.sanctum.panther.util.HFEncoded;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.Map;
@@ -24,13 +23,6 @@ public final class Test implements JsonAdapter<Test> {
 	}
 
 	public static void main(String[] args) throws Exception {
-
-		ResourceLookup lookup = new ResourceLookup(Thread.currentThread().getContextClassLoader(), "com.github.sanctum");
-		TaskChain.getAsynchronous().wait(() -> {
-			Class<?> cl = lookup.getClasses().get(c -> c.getSimpleName().equals("TriadConsumer"));
-			System.out.println(cl.getName());
-			TaskChain.getAsynchronous().shutdown();
-		}, 500);
 
 	}
 
