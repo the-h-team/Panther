@@ -37,7 +37,7 @@ class HttpConsumerImpl<T> extends HttpGetterImpl<T> implements HttpConsumer<T> {
 
     @Override
     public synchronized boolean isConsumed() {
-        return consumed;
+        return restricted && consumed;
     }
 
     @Override
@@ -54,7 +54,7 @@ class HttpConsumerImpl<T> extends HttpGetterImpl<T> implements HttpConsumer<T> {
     }
 
     private void validateNotConsumed() throws IllegalStateException {
-        if (restricted && isConsumed()) {
+        if (isConsumed()) {
             throw new IllegalStateException("Data has already been consumed");
         }
     }

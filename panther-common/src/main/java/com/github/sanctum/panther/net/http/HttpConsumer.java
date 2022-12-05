@@ -8,11 +8,12 @@ package com.github.sanctum.panther.net.http;
 public interface HttpConsumer<T> extends HttpGetter<T> {
 
     /**
-     * Whether the data has been consumed already.
+     * Check whether the data has been consumed already.
      * <p>
-     * Important for avoiding unnecessary updates.
+     * Returns false by default, this feature can be enabled in the building process to avoid unnecessary updates.
      *
-     * @return true if the data has been consumed
+     * @return true if the data has been consumed. In this case, {@link #consume()} will throw an exception.
+     * @see HttpUtils.ConsumerBuilder#restrictMultipleUsage(boolean)
      */
     boolean isConsumed();
 
@@ -21,7 +22,8 @@ public interface HttpConsumer<T> extends HttpGetter<T> {
      * <p>
      * The data has to be downloaded before that.
      *
-     * @throws IllegalStateException if the data hasn't been loaded yet.
+     * @throws IllegalStateException if the data hasn't been loaded yet or
+     *                               the current data set has already been consumed.
      */
     void consume();
 

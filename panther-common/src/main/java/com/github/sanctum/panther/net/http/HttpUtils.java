@@ -1,10 +1,6 @@
 package com.github.sanctum.panther.net.http;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -309,7 +305,6 @@ public class HttpUtils {
             return this;
         }
 
-        // TODO add @see to the related method which may throw
         /**
          * Helper to enforce that the data is only consumed once per update.
          * <p>
@@ -317,6 +312,7 @@ public class HttpUtils {
          *
          * @param restrictMultipleUsage true for restriction
          * @return this builder instance
+         * @see HttpConsumer#isConsumed()
          */
         public ConsumerBuilder<T> restrictMultipleUsage(boolean restrictMultipleUsage) {
             this.restrictMultipleUsage = restrictMultipleUsage;
