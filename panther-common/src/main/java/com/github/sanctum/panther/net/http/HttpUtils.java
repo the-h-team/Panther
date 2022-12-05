@@ -9,15 +9,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Entry point to the HTTP submodule
- * This class provides access to builders for common HTTP request objects
+ * Entry point to the HTTP submodule.
+ * <p>
+ * This class provides access to builders for common HTTP request objects.
  */
 public class HttpUtils {
 
     /**
      * Creates a new Builder for a Get Request Object which will parse the result to the desired form.
+     * <p>
      * The settings you choose in the process will determine the capabilities of
-     * the resulting {@link HttpGetter <Object>} subtype, which will be capable of holding intermediate results,
+     * the resulting {@link HttpGetter} subtype, which will be capable of holding intermediate results,
      * updating state and re-downloading the data either way. <br>
      * Usage example:
      * <code>
@@ -27,18 +29,20 @@ public class HttpUtils {
      * <br>.buildToResult();
      * </code>
      *
-     * @param url         the webserver address to get the data from, without any subpath on that page.
-     * @param dataBuilder the data building function which will be used to pre-process the retrieved string data to a more convenient data type.
+     * @param url         the webserver address to get the data from, without any subpath on that page
+     * @param dataBuilder the data building function which will be used to pre-process the retrieved string data to a more convenient data type
      * @param <T>         the type the pre-processed data will have
      * @return a new builder object with the given settings.
      */
+    @SuppressWarnings("JavadocLinkAsPlainText")
     public static <T> GeneralBuilder<T> newGetBuilder(String url, Function<String, T> dataBuilder) {
         return new GeneralBuilder<>(url, dataBuilder);
     }
 
     /**
      * Base class for all HttpGetter Builders.
-     * Used to store common data
+     * <p>
+     * Used to store common data.
      *
      * @param <T> the intermediate result type of Getters produced by this builder
      * @param <B> the current builder subtype
@@ -59,7 +63,7 @@ public class HttpUtils {
         }
 
         /**
-         * The document path to use
+         * The document path to use.
          *
          * @param subPath the path
          * @return this builder instance
@@ -70,9 +74,9 @@ public class HttpUtils {
         }
 
         /**
-         * Adds http request arguments to the HttpGetter.
+         * Add http request arguments to the HttpGetter.
          *
-         * @param arguments the arguments to be added.
+         * @param arguments the arguments to be added
          * @return this builder instance
          */
         public B addArguments(final Map<String, String> arguments) {
@@ -81,7 +85,7 @@ public class HttpUtils {
         }
 
         /**
-         * Adds a http request argument to the HttpGetter.
+         * Add a http request argument to the HttpGetter.
          *
          * @param key   the parameter name
          * @param value the value of the parameter
@@ -102,7 +106,7 @@ public class HttpUtils {
     }
 
     /**
-     * The builder construct for a simple {@link HttpGetter <T>}
+     * The builder construct for a simple {@link HttpGetter}.
      *
      * @param <T> the type of the intermediate result of the getter
      */
@@ -113,7 +117,8 @@ public class HttpUtils {
         }
 
         /**
-         * Attaches a processing function to the HttpGetter, which will turn the result type to a {@link HttpReducer}.
+         * Attach a processing function to the HttpGetter which will turn the result type to a {@link HttpReducer}.
+         * <p>
          * The function is intended to split up the work of a possible networking thread and worker thread.
          * This also can be useful to extract a validation flag of the intermediate result before continuing processing it.
          *
@@ -126,26 +131,27 @@ public class HttpUtils {
         }
 
         /**
-         * Attaches a collection of processing functions to the HttpGetter,
+         * Attach a collection of processing functions to the HttpGetter
          * which will turn the result type to a {@link HttpConsumer}.
-         * Those functions will be performed on the intermediate result.
+         * <p>
+         * The functions will be performed on the intermediate result.
          * Useful to reference multiple extraction and updating functions that rely on the state that has been retrieved.
          *
          * @param consumers the consumers to be attached
-         * @return a {@link ReducerBuilder} instance, containing the state of this builder instance
+         * @return a {@link ReducerBuilder} instance containing the state of this builder
          */
         public ConsumerBuilder<T> addConsumers(Collection<Consumer<T>> consumers) {
             return new ConsumerBuilder<>(this, consumers);
         }
 
         /**
-         * Attaches a  processing function to the HttpGetter,
-         * which will turn the result type to a {@link HttpConsumer}.
+         * Attach a processing function to the HttpGetter which will turn the result type to a {@link HttpConsumer}.
+         * <p>
          * This function will be performed on the intermediate result.
          * Useful to reference multiple extraction and updating functions that rely on the state that has been retrieved.
          *
          * @param consumer the consumer to be attached
-         * @return a {@link ReducerBuilder} instance, containing the state of this builder instance
+         * @return a {@link ReducerBuilder} instance containing the state of this builder
          */
         public ConsumerBuilder<T> addConsumer(Consumer<T> consumer) {
             return new ConsumerBuilder<>(this, consumer);
@@ -163,7 +169,7 @@ public class HttpUtils {
         /**
          * Creates a new {@link HttpGetter <T>} instance and downloads the data.
          *
-         * @return the created object.
+         * @return the created object after loading
          */
         public HttpGetter<T> buildAndLoad() {
             HttpGetter<T> getter = build();
@@ -172,7 +178,8 @@ public class HttpUtils {
         }
 
         /**
-         * Uses a freshly created {@link HttpGetter <T>} instance to download the data.
+         * Uses a freshly created {@link HttpGetter} instance to download the data.
+         * <p>
          * Note that this instance will be discarded, you will only get the result.
          *
          * @return the intermediate result
@@ -184,7 +191,7 @@ public class HttpUtils {
     }
 
     /**
-     * Specific builder for {@link HttpReducer} instances
+     * Specific builder for {@link HttpReducer} instances.
      *
      * @param <T> the intermediate type to be used
      * @param <R> the final type to be used
@@ -221,8 +228,8 @@ public class HttpUtils {
         }
 
         /**
-         * Creates a new {@link HttpReducer} instance,
-         * downloads and processes the data to a final result which is ready to be retrieved.
+         * Creates a new {@link HttpReducer} instance, downloads and processes
+         * the data to a final result which is ready to be retrieved.
          *
          * @return the new instance
          */
@@ -235,6 +242,7 @@ public class HttpUtils {
 
         /**
          * Uses a freshly created {@link HttpReducer <T>} instance to download and process the data.
+         * <p>
          * Note that the instance will be discarded, you will only get the result.
          *
          * @return the result
@@ -249,7 +257,7 @@ public class HttpUtils {
     }
 
     /**
-     * Specific builder for {@link HttpConsumer} instances
+     * Specific builder for {@link HttpConsumer} instances.
      *
      * @param <T> the intermediate type to be used
      */
@@ -274,8 +282,9 @@ public class HttpUtils {
         }
 
         /**
-         * Attaches a collection of processing functions to the HttpConsumer.
-         * Those functions will be performed on the intermediate result.
+         * Attaches a collection of processing functions to the {@link HttpConsumer}.
+         * <p>
+         * The functions will be performed on the intermediate result.
          * Useful to reference multiple extraction and updating functions that rely on the state that has been retrieved.
          *
          * @param consumers the consumers to be attached
@@ -287,7 +296,8 @@ public class HttpUtils {
         }
 
         /**
-         * Attaches a  processing function to the {@link HttpConsumer}.
+         * Attaches a processing function to the {@link HttpConsumer}.
+         * <p>
          * This function will be performed on the intermediate result.
          * Useful to reference multiple extraction and updating functions that rely on the state that has been retrieved.
          *
@@ -299,8 +309,10 @@ public class HttpUtils {
             return this;
         }
 
+        // TODO add @see to the related method which may throw
         /**
          * Helper to enforce that the data is only consumed once per update.
+         * <p>
          * If the restriction is desired, a {@link IllegalStateException} will be thrown when trying to process the same set of data twice.
          *
          * @param restrictMultipleUsage true for restriction
