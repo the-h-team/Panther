@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Use this environment to manipulate data sent to / read from a particular file location.</p>
  *
  * @author Hempfest
- * @version 1.0
+ * @version 2.0
  */
 public abstract class Configurable implements MemorySpace, Root {
 
