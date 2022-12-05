@@ -34,6 +34,7 @@ public abstract class EditorHandle extends Configurable.Handle {
 	 */
 	public abstract @Nullable InputStream onReset(@NotNull Configurable.Host host, @NotNull String name, @Nullable String fileName);
 
+	// TODO Refer to DataTable#NULL
 	/**
 	 * The event that takes place on each object provided from a {@link com.github.sanctum.panther.file.DataTable} write operation.
 	 * Supply overwrite information regarding value reception.

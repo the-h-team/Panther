@@ -1,8 +1,10 @@
 package com.github.sanctum.panther.file;
 
-import java.util.HashMap;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
+// TODO: Decide if this interface is allowed for extension by users
 /**
  * An interface dedicated to writing keyed objects to a {@link Configurable.Editor}
  *
@@ -10,35 +12,20 @@ import java.util.Map;
  * @version 1.0
  */
 public interface DataTable {
+	/**
+	 * Used to represent null values.
+	 */
+	Object NULL = new Object();
 
 	<T> DataTable set(String key, T value);
 
 	void clear();
 
-	Map<String, Object> values();
+	// TODO doc as read-only map (view)
+	@NotNull Map<String, Object> values();
 
 	static DataTable newTable() {
-		return new DataTable() {
-			final Map<String, Object> map = new HashMap<>();
-
-			@Override
-			public <T> DataTable set(String key, T value) {
-				if (value == null) {
-					map.put(key, "NULL");
-				} else map.put(key, value);
-				return this;
-			}
-
-			@Override
-			public void clear() {
-				map.clear();
-			}
-
-			@Override
-			public Map<String, Object> values() {
-				return map;
-			}
-		};
+		return new DataTableImpl();
 	}
 
 }

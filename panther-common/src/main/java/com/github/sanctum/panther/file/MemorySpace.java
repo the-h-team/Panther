@@ -17,15 +17,15 @@ public interface MemorySpace {
 	String getPath();
 
 	/**
-	 * Checks if a node exists under the specified name space.
+	 * Checks if a node exists under the current namespace.
 	 *
 	 * @param key the name space.
-	 * @return false if the specified name space is non existent or equal to an object not a node otherwise true
+	 * @return false if the specified name space is nonexistent or equal to an object not a node otherwise true
 	 */
 	boolean isNode(String key);
 
 	/**
-	 * Get's a child node to this current node under the specified name space.
+	 * Get a child node of this current node under the current namespace.
 	 *
 	 * <p>Nodes of nodes will automatically append each others key paths</p>
 	 *
