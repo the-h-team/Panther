@@ -33,7 +33,7 @@ import org.json.simple.parser.JSONParser;
  * @author Hempfest
  * @version 1.0
  */
-public class JsonConfiguration extends Configurable {
+public class JsonConfiguration extends AbstractJsonConfiguration {
 
 	private final File file;
 	private final File parent;
@@ -208,11 +208,10 @@ public class JsonConfiguration extends Configurable {
 	}
 
 	@SuppressWarnings("unchecked")
-	Object checkObject(java.lang.reflect.Type type, boolean array, Object object) {
+	Object deserializeType(java.lang.reflect.Type type, boolean array, Object object) {
 		Object target = object;
 		try {
 			Class<?> cl = Class.forName(type.getTypeName());
-			//if (type == ItemStack.class) type = JsonItemStack.class;
 			if (target instanceof JSONObject) {
 				JSONObject j = (JSONObject) object;
 				Gson g = JsonAdapter.getJsonBuilder().create();
@@ -289,19 +288,19 @@ public class JsonConfiguration extends Configurable {
 			if (obj instanceof JSONObject) {
 				JSONObject js = (JSONObject) obj;
 				if (js.containsKey(k)) {
-					ob = checkObject(type, false, js.get(k));
+					ob = deserializeType(type, false, js.get(k));
 					stop = true;
 				} else {
 					o = js;
 				}
 			} else {
-				ob = checkObject(type.isArray() ? type.getComponentType() : type, obj instanceof JSONArray, obj);
+				ob = deserializeType(type.isArray() ? type.getComponentType() : type, obj instanceof JSONArray, obj);
 				stop = true;
 			}
 		}
 		if (!stop) {
 			Object object = o.get(k);
-			ob = checkObject(type.isArray() ? type.getComponentType() : type, (object instanceof JSONArray), object);
+			ob = deserializeType(type.isArray() ? type.getComponentType() : type, (object instanceof JSONArray), object);
 		}
 		if (ob == null) return null;
 		if (!type.isArray() && !type.isAssignableFrom(ob.getClass())) return null;
@@ -543,8 +542,4 @@ public class JsonConfiguration extends Configurable {
 		return (List<Long>) l;
 	}
 
-	@Override
-	public Extension getType() {
-		return Type.JSON;
-	}
 }
