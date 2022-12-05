@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Entry point to the HTTP submodule
+ * This class provides access to builders for common HTTP request objects
+ */
 public class HttpUtils {
 
 	/**
