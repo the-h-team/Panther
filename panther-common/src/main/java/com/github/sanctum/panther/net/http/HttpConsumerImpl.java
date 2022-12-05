@@ -22,17 +22,21 @@ class HttpConsumerImpl<T> extends HttpGetterImpl<T> implements HttpConsumer<T> {
 
 	public void doConsume() {
 		consumers.forEach(c -> c.accept(getData()));
-		consumed = true;
+		synchronized (this) {
+			consumed = true;
+		}
 	}
 
 	@Override
 	public void load() {
 		super.load();
-		consumed = false;
+		synchronized (this) {
+			consumed = false;
+		}
 	}
 
 	@Override
-	public boolean isConsumed() {
+	public synchronized boolean isConsumed() {
 		return consumed;
 	}
 

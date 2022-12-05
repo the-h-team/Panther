@@ -38,7 +38,7 @@ class HttpGetterImpl<T> implements HttpGetter<T> {
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			//Create a request with selected target
-			var request = new HttpGet(url);
+			HttpGet request = new HttpGet(url);
 			//Set the subpath of the page to our desired document
 			if (subPath != null) {
 				request.setPath(subPath);
@@ -46,7 +46,7 @@ class HttpGetterImpl<T> implements HttpGetter<T> {
 			//Set the URI Arguments
 			URI uri;
 			try {
-				var builder = new URIBuilder(request.getUri());
+				URIBuilder builder = new URIBuilder(request.getUri());
 				arguments.forEach(builder::addParameter);
 				uri = builder.build();
 			} catch (URISyntaxException e) {
