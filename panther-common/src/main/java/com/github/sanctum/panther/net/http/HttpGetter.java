@@ -9,29 +9,29 @@ package com.github.sanctum.panther.net.http;
  */
 public interface HttpGetter<T> {
 
-	/**
-	 * Checks whether a data set already has been retrieved
-	 *
-	 * @return the loaded state
-	 */
-	boolean isLoaded();
+    /**
+     * Checks whether a data set already has been retrieved
+     *
+     * @return the loaded state
+     */
+    boolean isLoaded();
 
-	/**
-	 * Downloads a new set of data
-	 */
-	void load();
+    /**
+     * Downloads a new set of data
+     */
+    void load();
 
-	/**
-	 * @return the intermediate result data
-	 * @throws IllegalStateException if no data has been loaded yet
-	 */
-	T getData();
+    /**
+     * @return the intermediate result data
+     * @throws IllegalStateException if no data has been loaded yet
+     */
+    T getData();
 
-	/**
-	 * Downloads the data and returns the intermediate result
-	 *
-	 * @return the intermediate result data
-	 */
-	T loadAndGet();
+    /**
+     * Downloads the data and returns the intermediate result
+     *
+     * @return the intermediate result data
+     */
+    T loadAndGet();
 
 }
