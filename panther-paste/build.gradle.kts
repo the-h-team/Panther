@@ -14,4 +14,4 @@ dependencies {
     api(project(":panther-common"))
 }
 
-description = "panther-paste"
+description = "A library for working with Pastebin and hastebin"

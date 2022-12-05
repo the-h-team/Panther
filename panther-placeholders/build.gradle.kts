@@ -13,4 +13,4 @@ dependencies {
     api(project(":panther-containers"))
 }
 
-description = "panther-placeholders"
+description = "A text replacement library"

@@ -26,4 +26,4 @@ dependencies {
     api(project(":panther-containers"))
 }
 
-description = "panther-common"
+description = "The main library of Panther"

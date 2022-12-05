@@ -7,4 +7,4 @@ plugins {
     id("panther.publish-conventions")
 }
 
-description = "panther-containers"
+description = "Custom collection-style utilities"
