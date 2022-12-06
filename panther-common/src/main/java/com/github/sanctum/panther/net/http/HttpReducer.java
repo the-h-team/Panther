@@ -1,11 +1,11 @@
 package com.github.sanctum.panther.net.http;
 
 /**
- * HttpGetter that processes data further with a second function
+ * Representation of an HttpGetter that processes data further with a second function
  * to a final result.
  * <p>
- * Useful for requests you are only interested in one small part of
- * and for extracting a validation flag.
+ * Useful for requests that you are only interested in one small part of.
+ * Also, it can be used for extracting a validation flag before continuing processing the intermediate data
  *
  * @param <T> the intermediate type
  * @param <R> the desired result type
@@ -13,19 +13,23 @@ package com.github.sanctum.panther.net.http;
 public interface HttpReducer<T, R> extends HttpGetter<T> {
 
     /**
-     * Whether the second processing stage has already been performed.
+     * Checks whether the second processing stage has already been performed.
      *
-     * @return true if the data has been processed
+     * @return true if the data has been processed, false if no valid processing result is present
      */
     boolean isProcessed();
 
     /**
-     * Perform the second stage processing.
+     * Performs the processing stage.
+     * <br>
+     * <b>This needs having downloaded data to process!<b/>
+     *
+     * @throws IllegalStateException when no data has been downloaded to process
      */
     void process();
 
     /**
-     * Get the result of the second processing stage.
+     * Gets the result of the second processing stage.
      * <p>
      * <b>The data must be processed and loaded before calling this method!</b>
      *
@@ -35,7 +39,7 @@ public interface HttpReducer<T, R> extends HttpGetter<T> {
     R getResult();
 
     /**
-     * Start the second processing stage and get the result.
+     * Performs the second processing stage and get the result.
      * <p>
      * <b>The data must be loaded before calling this method!</b>
      *
@@ -45,7 +49,7 @@ public interface HttpReducer<T, R> extends HttpGetter<T> {
     R processAndGet();
 
     /**
-     * Load and process the data for returning a final result.
+     * Performs the data loading and the data processing to a final result.
      *
      * @return the result
      */

@@ -1,7 +1,7 @@
 package com.github.sanctum.panther.net.http;
 
 /**
- * Represents an HTTP Data Downloader.
+ * Representation of an HTTP Data Downloader.
  * <p>
  * It is capable of loading and updating data via HTTP, storing the results in
  * an intermediate format of type <code>T</code>.
@@ -13,19 +13,20 @@ package com.github.sanctum.panther.net.http;
 public interface HttpGetter<T> {
 
     /**
-     * Check whether a data set has already been retrieved.
+     * Checks whether a data set has already been retrieved.
      *
-     * @return the loaded state
+     * @return true if data is present, false otherwise
      */
     boolean isLoaded();
 
     /**
-     * Download a new set of data.
+     * Downloads a new set of data.
      */
     void load();
 
     /**
-     * Get the intermediate data.
+     * Gets the intermediate data.
+     * This method needs the getter having loaded data already, which you can tell by {@link #isLoaded()}
      *
      * @return the intermediate result data
      * @throws IllegalStateException if no data has been loaded yet
@@ -33,7 +34,7 @@ public interface HttpGetter<T> {
     T getData();
 
     /**
-     * Download data and get the intermediate result.
+     * Downloads new data and gets the intermediate result.
      *
      * @return the intermediate result data
      */

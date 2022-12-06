@@ -1,34 +1,39 @@
 package com.github.sanctum.panther.net.http;
 
+import java.util.function.Consumer;
+
 /**
- * HttpGetter that is able to pass data for further processing.
+ * Representation an HttpGetter that is able to pass data for further processing.
  *
  * @param <T> the intermediate result type for further processing
  */
 public interface HttpConsumer<T> extends HttpGetter<T> {
 
     /**
-     * Check whether the data has been consumed already.
+     * Checks whether the data has been consumed already.
      * <p>
-     * Returns false by default, this feature can be enabled in the building process to avoid unnecessary updates.
+     * If false is returned, {@link #consume()} will throw an exception by contract.
      *
-     * @return true if the data has been consumed. In this case, {@link #consume()} will throw an exception.
+     * @return false by default if no restriction flag has been set,
+     * true if single consumption flag has been set and the data has been consumed already
      * @see HttpUtils.ConsumerBuilder#restrictMultipleUsage(boolean)
      */
     boolean isConsumed();
 
     /**
-     * Start consumption of the intermediate result.
+     * Starts consumption of the intermediate result.
+     * All consumers attached to this HttpConsumer will get the result to process.
      * <p>
-     * The data has to be downloaded before that.
+     * The data has to be already downloaded before that.
      *
-     * @throws IllegalStateException if the data hasn't been loaded yet or
-     *                               the current data set has already been consumed.
+     * @throws IllegalStateException when the data hasn't been loaded yet or
+     *                               the current data set has already been consumed when consumption restriction has been set.
+     * @see HttpUtils.HttpGetterBuilder#addConsumer(Consumer)
      */
     void consume();
 
     /**
-     * Download a new set of data and starts its consumption.
+     * Downloads a new set of data and starts its consumption.
      */
     void loadAndConsume();
 
