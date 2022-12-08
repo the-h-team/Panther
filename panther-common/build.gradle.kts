@@ -11,9 +11,11 @@ plugins {
     id("panther.external-shadow-conventions")
 }
 
+val gsonVersion by extra("2.9.0")
+
 dependencies {
     // Expose upstream libraries to consumers
-    api("com.google.code.gson:gson:2.9.0")
+    api("com.google.code.gson:gson:$gsonVersion")
     api(
         "com.googlecode.json-simple",
         "json-simple",
