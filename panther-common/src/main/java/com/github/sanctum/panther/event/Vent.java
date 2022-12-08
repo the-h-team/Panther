@@ -3,6 +3,8 @@ package com.github.sanctum.panther.event;
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherList;
+import com.github.sanctum.panther.file.Configurable;
+import com.github.sanctum.panther.file.ConfigurableEditorQuery;
 import com.github.sanctum.panther.util.PantherLogger;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -747,7 +749,7 @@ public abstract class Vent {
 	/**
 	 * A placeholder class, implement it and use it for usage with the vent system.
 	 */
-	public interface Host {
+	public interface Host extends Configurable.Host {
 
 		/**
 		 * Subscribe to a listener using this host.

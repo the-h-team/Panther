@@ -5,6 +5,7 @@ import java.io.IOException;
 /**
  * An object dictating the management of a chunk of memory.
  */
+@SuppressWarnings("UnusedReturnValue")
 public interface Root {
 
 	/**

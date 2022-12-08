@@ -36,6 +36,7 @@ public final class PantherList<E> extends PantherCollectionBase<E> {
 	 * @return the last element in this list, could be the same as the first element or null.
 	 */
 	public E getLast() {
+		if (size == 1) return getFirst();
 		if (tail == null) return null;
 		return tail.data;
 	}

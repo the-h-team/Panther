@@ -1,17 +1,18 @@
 package com.github.sanctum.panther;
 
 import com.github.sanctum.panther.event.Vent;
+import com.github.sanctum.panther.file.Configurable;
 import com.github.sanctum.panther.file.JsonAdapter;
 import com.github.sanctum.panther.file.Node;
-import com.github.sanctum.panther.util.ResourceLookup;
-import com.github.sanctum.panther.util.TaskChain;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.io.File;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 @Vent.Link.Key("Main class")
 @Node.Pointer("com.github.sanctum.Test")
-public final class Test implements JsonAdapter<Test> {
+public final class Test implements JsonAdapter<Test>, Vent.Host {
 
 	String data;
 
@@ -24,14 +25,16 @@ public final class Test implements JsonAdapter<Test> {
 	}
 
 	public static void main(String[] args) throws Exception {
+		Test tes = new Test();
+		Configurable.Editor editor = Configurable.view(tes).get("test", Configurable.Type.JSON);
+		editor.write(t -> {
+			t.set("Steve.farts", 32);
+			t.set("Steve.eggs", 4);
+			t.set("Steve.bio", "Haha");
+		});
+		Configurable.Editor editor2 = Configurable.view(tes).get("test", Configurable.Type.JSON);
 
-		ResourceLookup lookup = new ResourceLookup(Thread.currentThread().getContextClassLoader(), "com.github.sanctum");
-		TaskChain.getAsynchronous().wait(() -> {
-			Class<?> cl = lookup.getClasses().get(c -> c.getSimpleName().equals("TriadConsumer"));
-			System.out.println(cl.getName());
-			TaskChain.getAsynchronous().shutdown();
-		}, 500);
-
+		System.out.println("Done.");
 	}
 
 	@Override
@@ -50,5 +53,15 @@ public final class Test implements JsonAdapter<Test> {
 	@Override
 	public Class<? extends Test> getSerializationSignature() {
 		return Test.class;
+	}
+
+	@Override
+	public @NotNull String getName() {
+		return "TestApp";
+	}
+
+	@Override
+	public @NotNull File getDataFolder() {
+		return new File("testing");
 	}
 }
