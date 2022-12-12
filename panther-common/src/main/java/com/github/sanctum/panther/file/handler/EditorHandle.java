@@ -3,11 +3,16 @@ package com.github.sanctum.panther.file.handler;
 import com.github.sanctum.panther.file.Configurable;
 import com.github.sanctum.panther.file.MemorySpace;
 import java.io.InputStream;
+
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A {@link Configurable.Handle} that is responsible for {@link Configurable.Editor} inside operations such as initialization and overall value management.
+ * A {@link Configurable.Handle} that is responsible for {@link Configurable.Editor}
+ * internal operations such as initialization and overall value management.
+ *
+ * @since 1.0.2
  */
 public abstract class EditorHandle extends Configurable.Handle {
 
@@ -34,7 +39,6 @@ public abstract class EditorHandle extends Configurable.Handle {
 	 */
 	public abstract @Nullable InputStream onReset(@NotNull Configurable.Host host, @NotNull String name, @Nullable String fileName);
 
-	// TODO Refer to DataTable#NULL
 	/**
 	 * The event that takes place on each object provided from a {@link com.github.sanctum.panther.file.DataTable} write operation.
 	 * Supply overwrite information regarding value reception.
@@ -43,8 +47,9 @@ public abstract class EditorHandle extends Configurable.Handle {
 	 * @param key The key the value is tagged to.
 	 * @param memorySpace The memory space the information belongs to.
 	 * @param toReplace whether the object is to overwrite an existing link.
-	 * @return The object being written from a provided data table operation. (could be null or 'NULL')
+	 * @return the value as written; possibly null if replacement is disabled
 	 */
-	public abstract @Nullable Object onWriteFromTable(@NotNull Object value, @NotNull String key, @NotNull MemorySpace memorySpace, boolean toReplace);
+	@Contract("_, _, _, true -> param1")
+	public abstract <V> @Nullable V onWriteFromTable(@NotNull V value, @NotNull String key, @NotNull MemorySpace memorySpace, boolean toReplace);
 
 }
