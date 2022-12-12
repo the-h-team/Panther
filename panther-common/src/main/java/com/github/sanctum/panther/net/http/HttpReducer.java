@@ -7,6 +7,8 @@ package com.github.sanctum.panther.net.http;
  * Useful for requests that you are only interested in one small part of.
  * Also, it can be used for extracting a validation flag before continuing processing the intermediate data
  *
+ * @since 1.0.2
+ * @author Rigobert0
  * @param <T> the intermediate type
  * @param <R> the desired result type
  */

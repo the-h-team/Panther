@@ -8,6 +8,9 @@ import java.util.function.Function;
  * Entry point to the HTTP submodule.
  * <p>
  * This utility class provides access to builders for common HTTP request objects.
+ *
+ * @since 1.0.2
+ * @author Rigobert0
  */
 public final class HttpUtils {
 
@@ -70,7 +73,10 @@ public final class HttpUtils {
 
         /**
          * Configures the file path to be used in the HttpGetter.
-         * As an example, in case of <b>https://www.youtube.com/watch?v=dQw4w9WgXcQ<b/>, "/watch" should be passed as argument
+         * <p>
+         * As an example, in the case of the following url:
+         * <pre><b>{@code https://www.youtube.com/watch?v=dQw4w9WgXcQ}</b></pre>
+         * {@code "/watch"} should be passed as {@code subPath}.
          *
          * @param subPath the path
          * @return this builder instance
@@ -81,9 +87,12 @@ public final class HttpUtils {
         }
 
         /**
-         * Registers an HTTP request arguments that will be used in the HttpGetter.
-         * As an example in case of <b>https://www.youtube.com/watch?v=dQw4w9WgXcQ<b/>
-         * the passed map should contain "v" as key and "dQw4w9WgXcQ" as value.
+         * Registers HTTP request arguments to be used in the HttpGetter.
+         * <p>
+         * As an example, in the case of the following url:
+         * <pre><b>{@code https://www.youtube.com/watch?v=dQw4w9WgXcQ}</b></pre>
+         * {@code arguments} should contain a mapping for the key {@code "v"}
+         * with {@code "dQw4w9WgXcQ"} as its value.
          *
          * @param arguments the arguments to be added
          * @return this builder instance
@@ -95,8 +104,10 @@ public final class HttpUtils {
 
         /**
          * Registers an HTTP request argument to be used in the HttpGetter.
-         * As an example in case of <b>https://www.youtube.com/watch?v=dQw4w9WgXcQ<b/>,
-         * pass "v" as key and "dQw4w9WgXcQ" as value.
+         * As an example, in the case of the following url:
+         * <pre><b>{@code https://www.youtube.com/watch?v=dQw4w9WgXcQ}</b></pre>
+         * pass {@code "v"} as {@code key} and {@code "dQw4w9WgXcQ"}
+         * as {@code value}.
          *
          * @param key   the parameter name
          * @param value the value of the parameter

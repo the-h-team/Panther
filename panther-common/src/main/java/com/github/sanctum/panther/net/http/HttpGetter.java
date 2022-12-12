@@ -8,6 +8,8 @@ package com.github.sanctum.panther.net.http;
  * Note that the first data loading has to be called manually, making this
  * callable from a network thread.
  *
+ * @since 1.0.2
+ * @author Rigobert0
  * @param <T> the intermediate type
  */
 public interface HttpGetter<T> {
