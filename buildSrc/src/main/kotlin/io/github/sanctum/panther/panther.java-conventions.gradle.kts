@@ -8,22 +8,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://oss.sonatype.org/content/groups/public/") {
-        name = "sonatype"
-    }
-    maven("https://oss.sonatype.org/content/repositories/snapshots/") {
-        name = "sonatype-snapshots-main"
-    }
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-        name = "sonatype-snapshots-alternate"
-    }
-    maven("https://jitpack.io") {
-        name = "JitPack"
-        content {
-            // TODO: narrow down the resolution to only artifacts that must come from jitpack
-//            includeGroup("com.github.ms5984")
-        }
-    }
 }
 
 dependencies {
@@ -36,7 +20,6 @@ dependencies {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
 }
 
 tasks.withType<JavaCompile>() {
