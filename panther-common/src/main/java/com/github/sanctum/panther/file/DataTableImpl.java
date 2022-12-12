@@ -11,11 +11,9 @@ class DataTableImpl implements DataTable {
     final Map<String, Object> map = new HashMap<>();
 
     @Override
-    public <T> DataTable set(String key, T value) {
+    public <T> DataTable set(@NotNull String key, T value) {
         if (value == null) {
-            // TODO: magic string, should be a dedicated object constant
-            // that way consumers can choose how to handle nulls
-            map.put(key, "NULL");
+            map.put(key, NULL);
         } else map.put(key, value);
         return this;
     }

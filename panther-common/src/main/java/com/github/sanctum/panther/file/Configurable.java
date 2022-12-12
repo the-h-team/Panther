@@ -33,11 +33,13 @@ import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO document base api, pull impl off into separate class(es)
 /**
  * A utility reserved for delegating {@link Type#JSON} or other types of files.
  *
  * <p>Use this environment to manipulate data sent to / read from a particular file location.</p>
  *
+ * @since 1.0.2
  * @author Hempfest
  * @version 2.0
  */
@@ -537,7 +539,7 @@ public abstract class Configurable implements MemorySpace, Root {
 					for (Map.Entry<String, Object> entry : table.values().entrySet()) {
 						Object o = handle.onWriteFromTable(entry.getValue(), entry.getKey(), configuration, replace);
 						if (o != null) {
-							if (o.equals("NULL")) { // TODO Use a constant for this check.
+							if (o == DataTable.NULL) {
 								configuration.set(entry.getKey(), null);
 							} else configuration.set(entry.getKey(), o);
 						}
@@ -920,14 +922,12 @@ public abstract class Configurable implements MemorySpace, Root {
 			}
 
 			@Override
-			public @Nullable Object onWriteFromTable(@NotNull Object value, @NotNull String key, @NotNull MemorySpace memorySpace, boolean toReplace) {
+			public <R> @Nullable R onWriteFromTable(@NotNull R value, @NotNull String key, @NotNull MemorySpace memorySpace, boolean toReplace) {
 				if (toReplace) {
 					return value;
 				} else {
-					if (!value.equals("NULL")) { // TODO Use a constant for this check.
-						if (!memorySpace.isNode(key)) { // only setting a value if one isn't there already.
-							return value;
-						}
+					if (!memorySpace.isNode(key)) { // only setting a value if one isn't there already.
+						return value;
 					}
 				}
 				return null;
