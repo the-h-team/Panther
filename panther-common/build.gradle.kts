@@ -26,6 +26,11 @@ dependencies {
     }
     // Expose "panther-container" to consumers
     api(project(":panther-containers"))
+    // Hide httpclient5 from consumers
+    implementation("org.apache.httpcomponents.client5", "httpclient5", "5.1.3") {
+        // don't drag in httpcore5-h2 because we aren't using it
+        exclude(group = "org.apache.httpcomponents.core5", module = "httpcore5-h2")
+    }
 }
 
 description = "The main library of Panther"

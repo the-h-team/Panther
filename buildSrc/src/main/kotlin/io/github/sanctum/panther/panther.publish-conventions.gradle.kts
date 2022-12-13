@@ -45,6 +45,11 @@ afterEvaluate {
                             name.set("Austin")
                             url.set("https://github.com/Hempfest")
                         }
+                        developer {
+                            id.set("Rigobert0")
+                            name.set("Frido")
+                            url.set("https://github.com/Rigobert0")
+                        }
                     }
                     scm {
                         connection.set("scm:git:git://github.com/the-h-team/Panther.git")
