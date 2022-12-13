@@ -4,6 +4,8 @@ A Java library for an enhanced workflow.
 ---
 
 ## Modules
+All modules currently target Java 8.
+
 ### panther-containers
 Custom collections-style utilities
 ### panther-placeholder
