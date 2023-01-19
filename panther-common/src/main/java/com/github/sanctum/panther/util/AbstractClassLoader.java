@@ -40,6 +40,7 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 
 	protected AbstractClassLoader(@NotNull File file, @Nullable("Plugin class/instance or classloader.") Object bukkit, ClassLoader parent, Object... args) throws IOException {
 		super(new URL[]{file.toURI().toURL()}, parent);
+		// TODO: Look to replace guava usage with different library (maybe gson's TypeToken?)
 		final Class<T> main = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
 		final Logger logger = PantherLogger.getInstance().getLogger();
 		final PantherMap<String, Class<?>> loadedClasses = new PantherEntryMap<>();
