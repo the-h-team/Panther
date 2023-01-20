@@ -10,24 +10,30 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-//A annotation, S subject
+/**
+ * Representation of a container that holds the annotations of the methods of a class.
+ * The scan will be performed for an annotation type given.
+ * The results can be filtered and sorted.
+ *
+ * @param <A> The annotation type the class will be checked for
+ * @param <S> the type of the read target
+ */
 public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method> {
 
+
     /**
-     * Filters the methods and only work with ones of interest.
-     * <p>
-     * ~~WARNING~~ Overwrites the method collection and doesn't test accessibility, use {@link AnnotationDiscovery#filter(Predicate)} first.
+     * Sorts the method buffer. This is lazy evaluated.
      *
-     * @param comparator The comparator to use.
-     * @return The same annotation discovery object.
+     * @param comparator The comparator to use
+     * @return The same annotation discovery object
      */
     AnnotationUtil<A, S> sort(Comparator<? super Method> comparator);
 
     /**
      * Filter the methods and only work with ones of interest.
      *
-     * @param hard whether to breach accessibility.
-     * @return The same annotation discovery object.
+     * @param hard whether to breach accessibility
+     * @return The same annotation discovery object
      */
     default AnnotationUtil<A, S> filter(boolean hard) {
         return filter(method -> true, hard);
@@ -36,8 +42,8 @@ public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method
     /**
      * Filter the methods and only work with ones of interest.
      *
-     * @param predicate The filtration.
-     * @return The same annotation discovery object.
+     * @param predicate The filtration
+     * @return The same annotation discovery object
      */
     default AnnotationUtil<A, S> filter(Predicate<? super Method> predicate) {
         return filter(predicate, false);
@@ -46,15 +52,15 @@ public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method
     /**
      * Filter the methods and only work with ones of interest.
      *
-     * @param predicate The filtration.
-     * @param hard      whether or not to breach accessibility.
-     * @return The same annotation discovery object.
+     * @param predicate The filtration
+     * @param hard      whether to breach accessibility
+     * @return The same annotation discovery object
      */
     AnnotationUtil<A, S> filter(Predicate<? super Method> predicate, boolean hard);
 
 
     /**
-     * @return true if the desired annotation is present at all.
+     * @return true when the desired annotation is present at all.
      */
     boolean isPresent();
 
@@ -92,6 +98,11 @@ public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method
     <U> List<U> mapFromMethods(AnnotationDiscovery.AnnotativeConsumer<A, S, U> function);
 
     /**
+     * Resets all the filtering and sorting performed on the discovered methods.
+     */
+    void reset();
+
+    /**
      * @return List's all filtered methods.
      */
     Set<Method> methods();
@@ -116,13 +127,24 @@ public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method
      */
     int filterCount();
 
-
-    static @NotNull <T extends Annotation, S> AnnotationDiscovery<T, S> of(@NotNull Class<T> c, @NotNull S listener) {
-        return new AnnotationDiscovery<>(c, listener);
+    /**
+     * Reads all the annotations assignable from a certain class from a method.
+     *
+     * @param m      the method to check for annotations
+     * @param aClass the annotation class the read annotations have to be assignable from.
+     * @param <A>    the annotation supertype all read annotations will have.
+     * @return a set containing all discovered annotations.
+     */
+    static <A extends Annotation> Set<A> read(Method m, Class<A> aClass) {
+        return AnnotationUtilImpl.read(m, aClass);
     }
 
-    static @NotNull <T extends Annotation, S> AnnotationDiscovery<T, S> of(@NotNull Class<T> c, @NotNull Class<S> listener) {
-        return new AnnotationDiscovery<>(c, listener);
+    static @NotNull <T extends Annotation, S> AnnotationUtil<T, S> of(@NotNull Class<T> c, @NotNull S listener) {
+        return new AnnotationUtilImpl<>(c, listener);
+    }
+
+    static @NotNull <T extends Annotation, S> AnnotationUtil<T, S> of(@NotNull Class<T> c, @NotNull Class<S> listener) {
+        return new AnnotationUtilImpl<>(c, listener);
     }
 
 }
