@@ -16,7 +16,9 @@ import java.util.stream.Collectors;
  *
  * @param <T> A type of annotation.
  * @param <R> The class type to be checked for annotations.
+ * @deprecated The class has been replaced by {@link AnnotationMap}. Please use it for any new implementation.
  */
+@Deprecated
 public final class AnnotationDiscovery<T extends Annotation, R> implements Iterable<Method>, AnnotationUtil<T, R> {
 
     private final int count;
@@ -69,6 +71,11 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
 
     public static @NotNull <T extends Annotation, R> AnnotationDiscovery<T, R> of(@NotNull Class<T> c, @NotNull Class<R> listener) {
         return new AnnotationDiscovery<>(c, listener);
+    }
+
+    @Override
+    public void reset() {
+        methods().clear();
     }
 
     /**
