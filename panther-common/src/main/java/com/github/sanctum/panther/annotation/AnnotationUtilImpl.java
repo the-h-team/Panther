@@ -143,6 +143,7 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
     }
 
     //FIXME Empty set more desirable than null?
+    // Absolutely yes. If we don't remove this method we should at least return empty.
     @Override
     public <U> List<U> mapFromMethods(AnnotationDiscovery.AnnotativeConsumer<A, S, U> function) {
         if (hasFilteredMethods()) {
@@ -160,8 +161,8 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
     }
 
     @Override
-    public Set<A> read(Method m) {
-        return read(m, annotationType);
+    public Set<A> read(Method method) {
+        return read(method, annotationType);
     }
 
     //FIXME Candidate for superinterface

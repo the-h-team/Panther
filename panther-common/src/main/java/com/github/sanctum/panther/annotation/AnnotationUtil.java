@@ -10,71 +10,79 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+// TODO rename class to reflect Method-specific utility?
 /**
- * Representation of a container that holds the annotations of the methods of a class.
- * The scan will be performed for an annotation type given.
- * The results can be filtered and sorted.
+ * Processes annotations on the methods of a class.
+ * <p>Annotations of a given supertype are processed. The results can be
+ * filtered and sorted.
  *
- * @param <A> The annotation type the class will be checked for
- * @param <S> the type of the read target
+ * @param <A> the annotation supertype to process
+ * @param <S> the static type of the class being processed
  */
 public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method> {
 
-
     /**
-     * Sorts the method buffer. This is lazy evaluated.
+     * Applies sorting to the method buffer.
+     * <p>This is lazily evaluated.
      *
-     * @param comparator The comparator to use
-     * @return The same annotation discovery object
+     * @param comparator the comparator to use
+     * @return this annotation util
      */
     AnnotationUtil<A, S> sort(Comparator<? super Method> comparator);
 
     /**
-     * Filter the methods and only work with ones of interest.
+     * Applies a filter to the method buffer.
+     * <p>This is lazily evaluated.
      *
-     * @param hard whether to breach accessibility
-     * @return The same annotation discovery object
+     * @param hard whether to breach accessibility FIXME is this still needed? working?
+     * @return this annotation util
      */
     default AnnotationUtil<A, S> filter(boolean hard) {
         return filter(method -> true, hard);
     }
 
     /**
-     * Filter the methods and only work with ones of interest.
+     * Applies a filter to the method buffer.
+     * <p>This is lazily evaluated.
      *
-     * @param predicate The filtration
-     * @return The same annotation discovery object
+     * @param predicate a test function
+     * @return this annotation util
      */
     default AnnotationUtil<A, S> filter(Predicate<? super Method> predicate) {
         return filter(predicate, false);
     }
 
     /**
-     * Filter the methods and only work with ones of interest.
+     * Applies a filter to the method buffer.
+     * <p>This is lazily evaluated.
      *
-     * @param predicate The filtration
-     * @param hard      whether to breach accessibility
-     * @return The same annotation discovery object
+     * @param predicate a test function
+     * @param hard      whether to breach accessibility FIXME this is unused in the impl
+     * @return this annotation util
      */
     AnnotationUtil<A, S> filter(Predicate<? super Method> predicate, boolean hard);
 
 
     /**
-     * @return true when the desired annotation is present at all.
+     * Determines if any annotated methods are present.
+     *
+     * @return true if the desired annotation is present on any method
      */
     boolean isPresent();
 
 
     /**
-     * Run an operation with every annotated method found.
+     * Runs an operation with every annotated method found.
      *
-     * @param function The function.
+     * @param function an operation
      * @deprecated misleading name, renamed to {@link }TODO
      */
-    void ifPresent(BiConsumer<A, Method> function);
+    void ifPresent(BiConsumer<A, Method> function); // FIXME use ? super A
 
 
     /**
+     * FIXME remove or re-doc
+     * FIXME using deprecated components as parameter, either pull or replace them
      * Get information from the leading source objects located annotation.
      * <p>
      * This method gives you access to an annotation and the source object itself.
@@ -87,6 +95,8 @@ public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method
 
 
     /**
+     * FIXME remove or re-doc
+     * FIXME using deprecated components as parameter, either pull or replace them
      * Get information from the leading source objects methods found with the specified annotation.
      * <p>
      * This method gives you access to an annotation and the source object itself.
@@ -98,53 +108,64 @@ public interface AnnotationUtil<A extends Annotation, S> extends Iterable<Method
     <U> List<U> mapFromMethods(AnnotationDiscovery.AnnotativeConsumer<A, S, U> function);
 
     /**
-     * Resets all the filtering and sorting performed on the discovered methods.
+     * Resets all filtering and sorting settings.
      */
     void reset();
 
     /**
-     * @return List's all filtered methods.
-     */
-    Set<Method> methods();
-
-
-    /**
-     * Read all annotations from a method that fit this query.
+     * Gets all methods after filtering.
      *
-     * @param m The method to read.
-     * @return A set of annotations only matching this discovery query.
+     * @return a filtered list of methods
      */
-    Set<A> read(Method m);
+    Set<Method> methods(); // FIXME prefer "getMethods" or "getFilteredMethods"
 
 
     /**
-     * @return The total amount of relevant annotated methods found.
+     * Reads all matching annotations from a method.
+     *
+     * @param method the method to scan
+     * @return the set of annotations matching this discovery query
+     */
+    Set<A> read(Method method);
+
+
+    /**
+     * Gets the total number of relevant annotated methods found.
+     *
+     * @return the total number of relevant methods found
      */
     int count();
 
     /**
-     * @return The amount of methods after filtering
+     * Gets the number of methods after filtering.
+     *
+     * @return the number of methods after filtering
      */
     int filterCount();
 
     /**
-     * Reads all the annotations assignable from a certain class from a method.
+     * Reads all annotations assignable from a certain class from a method.
+     * <p>
+     * Discovers on {@code method} all annotations which inherit from
+     * {@code aClass}.
      *
-     * @param m      the method to check for annotations
-     * @param aClass the annotation class the read annotations have to be assignable from.
-     * @param <A>    the annotation supertype all read annotations will have.
-     * @return a set containing all discovered annotations.
+     * @param method the method to check for annotations
+     * @param aClass the class each annotation must be assignable from
+     * @param <A>    the supertype of all read annotations
+     * @return a set of annotations
      */
-    static <A extends Annotation> Set<A> read(Method m, Class<A> aClass) {
-        return AnnotationUtilImpl.read(m, aClass);
+    static <A extends Annotation> Set<A> read(Method method, Class<A> aClass) {
+        return AnnotationUtilImpl.read(method, aClass);
     }
 
-    static @NotNull <T extends Annotation, S> AnnotationUtil<T, S> of(@NotNull Class<T> c, @NotNull S listener) {
-        return new AnnotationUtilImpl<>(c, listener);
+    // FIXME doc
+    static @NotNull <T extends Annotation, S> AnnotationUtil<T, S> of(@NotNull Class<T> annotationClass, @NotNull S subject) {
+        return new AnnotationUtilImpl<>(annotationClass, subject);
     }
 
-    static @NotNull <T extends Annotation, S> AnnotationUtil<T, S> of(@NotNull Class<T> c, @NotNull Class<S> listener) {
-        return new AnnotationUtilImpl<>(c, listener);
+    // FIXME doc
+    static @NotNull <T extends Annotation, S> AnnotationUtil<T, S> of(@NotNull Class<T> annotationClass, @NotNull Class<S> sClass) {
+        return new AnnotationUtilImpl<>(annotationClass, sClass);
     }
 
 }
