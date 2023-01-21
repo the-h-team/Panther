@@ -95,6 +95,7 @@ public interface PasteManager extends Service {
 									conn.setRequestMethod("GET");
 									conn.setRequestProperty("User-Agent", "Hastebin Java Api");
 									conn.setUseCaches(false);
+									// TODO: Look to replace guava usage with different library
 									List<String> lines = Resources.readLines(conn.getURL(), Charsets.UTF_8);
 									return lines.toArray(new String[0]);
 								} catch (Exception ex) {
