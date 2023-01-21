@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO package-private? (remove public modifier)
 public class AnnotationMapImpl<T> implements AnnotationMap<T> {
 
     final T subject;
@@ -19,6 +20,7 @@ public class AnnotationMapImpl<T> implements AnnotationMap<T> {
     final List<Method> allAnnotatedMethods = new LinkedList<>();
 
 
+    // TODO package-private? (remove public modifier)
     public AnnotationMapImpl(T subject) {
         this.subject = subject;
         for (Method method : subject.getClass().getMethods()) {
