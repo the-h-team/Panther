@@ -11,6 +11,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO package-private? (remove public modifier)
+// FIXME pull methods up to superinterface
 public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUtil<A, S> {
 
     private final int count;
@@ -22,6 +24,7 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
     boolean evaluated = true;
     private final Set<Method> allAnnotatedMethods;
 
+    // TODO package-private? (remove public modifier). rationale: already exposed via AnnotationUtil.of(Class, Object)
     @SuppressWarnings("unchecked")
     public AnnotationUtilImpl(Class<A> annotationType, S subject) {
         this(annotationType, (Class<S>) subject.getClass(), subject);
