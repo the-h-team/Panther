@@ -1,5 +1,8 @@
 package com.github.sanctum.panther.annotation;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,13 +10,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>Indicates that a (class, method, parameter or field) is not in stable state yet. It may be renamed, changed or
- * even removed in a future version. This annotation refers to API status only, it doesn't mean that the implementation has
- * any significant bias towards current use.</p>
+ * Indicates that an API member (a class, method, parameter or field) is not in
+ * stable state yet. It may be renamed, changed or removed in a future version.
+ * <p>
+ * <strong>This annotation should be used on API elements only--it communicates
+ * merely <em>the stability of an interface</em>--not the stability or the
+ * performance of its underlying implementation.</strong>
+ * It is generally safe to use an element marked with this annotation--though
+ * unstable API may require closer study of its related dev comments. If,
+ * however, the element belongs to an external library linkage it might also be
+ * that the annotation is used to forecast likely linkage issues if/when that
+ * library is updated to a new version.</p>
  *
- * <p>It's safe to use an element marked with this annotation depending on the leading dev comment it holds. However,
- * if the declaration belongs to an external library such usages may lead to problems when the library will be updated to another version.</p>
- *
+ * @since 1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,13 +30,19 @@ import java.lang.annotation.Target;
 public @interface Experimental {
 
 	/**
-	 * @return The developer comment for this experiment.
+	 * Gets the developer comment about this element.
+	 *
+	 * @return the developer comment
 	 */
-	String dueTo() default "no comment";
+	@NotNull String dueTo() default "";
 
 	/**
-	 * @return Whether or not the element this annotation belongs too is set for removal.
+	 * @deprecated see {@link Removal}
+	 * @return Whether the element this annotation belongs to is set for removal.
 	 */
+	@Deprecated
+	@Removal(inVersion = "1.0.2")
+	@ApiStatus.ScheduledForRemoval(inVersion = "1.0.2")
 	boolean atRisk() default false;
 
 }

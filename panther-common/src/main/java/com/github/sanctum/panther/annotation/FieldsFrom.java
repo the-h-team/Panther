@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * For areas that require or utilize field constants from a specific class, use this annotation to point to it.
+ * Resolve field constants from a specific class.
+ *
+ * @since 1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,9 +18,9 @@ import org.jetbrains.annotations.NotNull;
 public @interface FieldsFrom {
 
 	/**
-	 * The class containing the desired fields.
+	 * Gets the class containing the desired fields.
 	 *
-	 * @return the class containing fields.
+	 * @return the class containing fields
 	 */
 	@NotNull Class<?> value();
 

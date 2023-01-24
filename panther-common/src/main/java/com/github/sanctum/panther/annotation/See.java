@@ -1,13 +1,18 @@
 package com.github.sanctum.panther.annotation;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+// FIXME Drop RetentionPolicy.RUNTIME if no reflection use
 /**
- * <p>Hint at 1 or more classes for usage in workflow.</p>
+ * Hints at one or more classes for use in a workflow.
+ *
+ * @since 1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -15,9 +20,11 @@ import java.lang.annotation.Target;
 public @interface See {
 
 	/**
-	 * @return the class to check out.
+	 * Gets the class or classes to reference.
+	 *
+	 * @return the class(es) to reference
 	 */
-	Class<?>[] value();
+	@NotNull Class<?>[] value();
 
 
 }
