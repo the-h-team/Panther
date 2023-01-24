@@ -6,10 +6,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+// FIXME if the code has been removed how can we document it?
+//  see also @deprecated (Javadoc tag), @ApiStatus.ScheduledForRemoval annotation
+// I like this concept, maybe we can make an annotation/javadoc tag for MC version-sensitive functionality
 /**
- * <p>Provide brief explanations to code removal for specific project versions.</p>
+ * Provides brief explanations for code removal for specific project versions.
+ *
+ * @since 1.0.0
  */
 @Documented
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.ANNOTATION_TYPE, ElementType.TYPE_USE, ElementType.LOCAL_VARIABLE})
 public @interface Removal {
