@@ -24,6 +24,8 @@ dependencies {
         // prevent dragging in junit and therefore hamcrest
         exclude(group = "junit", module = "junit")
     }
+    // Expose "panther-annotations" to consumers
+    api(project(":panther-annotations"))
     // Expose "panther-container" to consumers
     api(project(":panther-containers"))
     // Hide httpclient5 from consumers
