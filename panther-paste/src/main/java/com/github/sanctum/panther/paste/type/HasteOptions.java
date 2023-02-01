@@ -1,13 +1,12 @@
 package com.github.sanctum.panther.paste.type;
 
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.paste.option.Context;
 import com.github.sanctum.panther.paste.option.Expiration;
 import com.github.sanctum.panther.paste.option.Visibility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Note("This class simply acts as an inherent delegate for Hastebin")
+// This class simply acts as an inherent delegate for Hastebin
 public interface HasteOptions extends PasteOptions {
 
 	boolean isRaw();

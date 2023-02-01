@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Note;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,7 +29,8 @@ public class HFEncoded {
 		this.obj = obj;
 	}
 
-	@Note("Delegation for both serialization & deserialization transactions")
+	// Delegation for both serialization & deserialization transactions
+	// TODO test--is this change going to break serialized content *again*?
 	public static HFEncoded of(@NotNull Object obj) {
 		return new HFEncoded(obj);
 	}
