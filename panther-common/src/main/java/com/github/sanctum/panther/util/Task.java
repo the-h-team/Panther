@@ -1,7 +1,6 @@
 package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.annotation.Note;
-import com.github.sanctum.panther.annotation.Synchronized;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherList;
 import java.lang.annotation.Documented;
@@ -174,7 +173,8 @@ public abstract class Task implements Applicable {
 
 	public interface Synchronizer {
 
-		@Synchronized void sync(@NotNull Runnable runnable);
+		// FIXME Add javadoc explaining contract
+		void sync(@NotNull Runnable runnable);
 
 	}
 
