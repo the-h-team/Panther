@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.annotation;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Documented;
@@ -20,7 +19,12 @@ import java.lang.annotation.Target;
  * unstable API may require closer study of its related dev comments. If,
  * however, the element belongs to an external library linkage it might also be
  * that the annotation is used to forecast likely linkage issues if/when that
- * library is updated to a new version.</p>
+ * library is updated to a new version.
+ * <p>
+ * This annotation very closely resembles
+ * {@link org.jetbrains.annotations.ApiStatus.Experimental} with the additional
+ * feature that it is retained at runtime. This facilitates program logic based
+ * on the presence and/or content of this annotation.
  *
  * @since 1.0.0
  */
@@ -28,7 +32,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD, ElementType.CONSTRUCTOR})
 public @interface Experimental {
-
 	/**
 	 * Gets the developer comment about this element.
 	 *
@@ -37,12 +40,13 @@ public @interface Experimental {
 	@NotNull String dueTo() default "";
 
 	/**
-	 * @deprecated see {@link Removal}
-	 * @return Whether the element this annotation belongs to is set for removal.
+	 * Whether this element is at risk of removal.
+	 * <p>
+	 * What exactly is meant by "at risk of removal" is left to the developer.
+	 * You may refer to the developer comment (if present) for details.
+	 *
+	 * @return true if the element is at risk of removal
 	 */
-	@Deprecated
-	@Removal(inVersion = "1.0.2")
-	@ApiStatus.ScheduledForRemoval(inVersion = "1.0.2")
 	boolean atRisk() default false;
 
 }

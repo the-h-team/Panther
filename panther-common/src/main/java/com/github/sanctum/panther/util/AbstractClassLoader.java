@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Comment;
 import com.github.sanctum.panther.annotation.Experimental;
 import com.github.sanctum.panther.annotation.Voluntary;
 import com.github.sanctum.panther.container.ImmutablePantherMap;
@@ -100,7 +99,7 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 		} else this.mainClass = null;
 	}
 
-	@Comment("Set the class loader of a bukkit object")
+	// Set the class loader of a bukkit object FIXME: move whole method to laby?
 	void setBukkitHandler(@NotNull Object handler) {
 		if (handler instanceof ClassLoader) {
 			this.bukkitHandler = (ClassLoader) handler;
@@ -196,7 +195,7 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 		return true;
 	}
 
-	@Comment("A reflection getter for internally supporting bukkit. Yes its this easy.")
+	// A reflection getter for internally supporting bukkit. Yes its this easy. FIXME move whole method to laby?
 	Map<String, Class<?>> getBukkitClassMap() throws IllegalStateException {
 		try {
 			Field f = Class.forName("org.bukkit.plugin.java.PluginClassLoader").getDeclaredField("classes");
