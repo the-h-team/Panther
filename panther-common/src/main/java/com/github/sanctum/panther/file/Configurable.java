@@ -1,7 +1,6 @@
 package com.github.sanctum.panther.file;
 
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherCollectors;
 import com.github.sanctum.panther.container.PantherEntryMap;
@@ -30,6 +29,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -507,32 +508,44 @@ public abstract class Configurable implements MemorySpace, Root {
 		}
 
 		/**
-		 * Set/Replace & save multiple keyed value spaces within this file.
+		 * Sets/replaces and saves multiple keyed value spaces within this file.
+		 * <p>
+		 * After all entries have been processed the table object is cleared
+		 * and may be discarded to conserve memory.
+		 * <p>
+		 * Takes all 2d declarations and forms them into multi-layered nodes.
+		 * <p>
+		 * This overload automatically overwrites existing entries.
 		 *
 		 * @param table The data table to use when setting values.
+		 * @implNote The table is cleared after all entries have been written.
+		 * @see DataTable#newTable()
 		 * @see Editor#write(DataTable, boolean)
 		 */
-		@Note("You can create a fresh DataTable really easily see DataTable#newTable()")
-		public void write(@Note("Provided table gets cleared upon finalization.") DataTable table) {
+		@Contract(mutates = "param")
+		public void write(DataTable table) {
 			write(table, true);
 		}
 
 		/**
-		 * Set & save multiple keyed value spaces within this file.
+		 * Sets and saves multiple keyed value spaces within this file.
+		 * <p>
+		 * After all entries have been processed the table object is cleared
+		 * and may be discarded to conserve memory.
+		 * <p>
+		 * Takes all 2d declarations and forms them into multi-layered nodes.
+		 * <p>
+		 * This overload allows you to specify whether existing entries should
+		 * be overwritten.
 		 *
-		 * <p>After all inquires have been transferred the inquiry object is cleared and discarded due to
-		 * being of no further importance.</p>
-		 *
-		 * <p>Takes all 2d declarations and forms them into multi-layered nodes.</p>
-		 *
-		 * <p>By default this method is set to override any already existing nodes store
-		 * within the configurable</p>
-		 *
+		 * @param table the data table to use when setting values
 		 * @param replace Whether to replace already set values from file with ones from the table
+		 * @implNote The table is cleared after all entries have been written.
+		 * @see DataTable#newTable()
 		 * @see Editor#write(DataTable)
 		 */
-		@Note("You can create a fresh DataTable really easily see DataTable#newTable()")
-		public void write(@Note("Provided table gets cleared upon finalization.") DataTable table, boolean replace) {
+		@Contract(mutates = "param1")
+		public void write(DataTable table, boolean replace) {
 			PantherList<EditorHandle> handles = getHandles(EditorHandle.class);
 			for (EditorHandle handle : handles) {
 				if (handle != null) {
@@ -546,7 +559,8 @@ public abstract class Configurable implements MemorySpace, Root {
 					}
 				}
 				// instantly clear up space (help GC, we don't need these elements anymore.)
-				table.clear();
+				table.clear(); // FIXME what if another editor handle needs to use this table?
+				               //  if this will "never" happen, look into why we are using the for loop
 				configuration.save();
 			}
 		}

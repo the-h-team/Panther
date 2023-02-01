@@ -40,7 +40,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface PasteManager extends Service {
 
-	@Note("This is an overridable provision!")
+	/**
+	 * Gets the paste manager instance.
+	 *
+	 * @return the paste manager instance
+	 * @implNote This is an overridable provision! An alternative
+	 * implementation may be registered by you or another assembly.
+	 */
 	static PasteManager getInstance() {
 		// skip using an optional, fast stop if a provider is already cached.
 		PasteManager manager = ServiceFactory.getInstance().getService(PasteManager.class);
@@ -686,6 +692,7 @@ public interface PasteManager extends Service {
 
 	@NotNull Hastebin newHaste();
 
+	// is this printed at runtime? if not FIXME remove/convert to doc
 	@Note("This method requires a unique api key! Make sure you have an account registered")
 	@NotNull Pastebin newPaste(@NotNull String apiKey);
 

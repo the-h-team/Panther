@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherList;
 import java.lang.annotation.Documented;
@@ -12,7 +11,7 @@ import java.util.concurrent.Future;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
-@Note("This class requires a no argument method with ordinal level 0")
+// This class requires a no argument method with ordinal level 0 FIXME < this as doc
 public abstract class Task implements Applicable {
 
 	public static final TypeAdapter<Task> FLAG = () -> Task.class;
@@ -107,7 +106,13 @@ public abstract class Task implements Applicable {
 		return flag.cast(this);
 	}
 
-	@Note("This method only responds true if your class is annotated with a delay period of execution.")
+	/**
+	 * Whether the task is repeatable or not.
+	 *
+	 * @return true if the task is repeatable
+	 * @implNote This method checks if a {@link Period} annotation is present
+	 * on this class.
+	 */
 	public final boolean isRepeatable() {
 		return getClass().isAnnotationPresent(Period.class);
 	}
