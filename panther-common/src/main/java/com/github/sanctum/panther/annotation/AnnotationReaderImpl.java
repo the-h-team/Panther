@@ -11,9 +11,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO package-private? (remove public modifier)
 // FIXME pull methods up to superinterface
-public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUtil<A, S> {
+class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<A, S> {
 
     private final int count;
     private final Class<A> annotationType;
@@ -23,19 +22,19 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
     private Stream<Method> pipeline;
     boolean evaluated = true;
     private final Set<Method> allAnnotatedMethods;
+    private Comparator<? super Method> comparator;
 
-    // TODO package-private? (remove public modifier). rationale: already exposed via AnnotationUtil.of(Class, Object)
     @SuppressWarnings("unchecked")
-    public AnnotationUtilImpl(Class<A> annotationType, S subject) {
+    AnnotationReaderImpl(Class<A> annotationType, S subject) {
         this(annotationType, (Class<S>) subject.getClass(), subject);
     }
 
-    AnnotationUtilImpl(Class<A> annotationType, Class<S> sClass) {
+    AnnotationReaderImpl(Class<A> annotationType, Class<S> sClass) {
         this(annotationType, sClass, null);
     }
 
     //Combined constructor for both approaches
-    AnnotationUtilImpl(Class<A> annotationType, Class<S> sClass, S subject) {
+    AnnotationReaderImpl(Class<A> annotationType, Class<S> sClass, S subject) {
         this.annotationType = annotationType;
         this.sClass = sClass;
         this.subject = subject;
@@ -64,21 +63,30 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
         if (isEvaluated()) {
             return;
         }
-        methodBuffer = pipeline.collect(Collectors.toCollection(LinkedHashSet::new));
+        if (comparator != null) {
+            methodBuffer = pipeline.collect(Collectors.toCollection(this::provideTreeSet));
+        } else {
+            methodBuffer = pipeline.collect(Collectors.toCollection(LinkedHashSet::new));
+        }
         evaluated = true;
         pipeline = methodBuffer.stream();
+    }
+
+    private Set<Method> provideTreeSet() {
+        return new TreeSet<>(comparator);
     }
 
     public void reset() {
         methodBuffer = new HashSet<>(allAnnotatedMethods);
         pipeline = methodBuffer.stream();
+        comparator = null;
         evaluated = true;
     }
 
     @Override
-    public AnnotationUtil<A, S> sort(Comparator<? super Method> comparator) {
+    public AnnotationReader<A, S> sort(Comparator<? super Method> comparator) {
         evaluated = false;
-        pipeline = pipeline.sorted(comparator);
+        this.comparator = comparator;
         return this;
     }
 
@@ -86,7 +94,7 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
      * If so, the total collection needs to be changed into a Map<Boolean,Method> for being able to get accessible methods easily
      */
     @Override
-    public AnnotationUtil<A, S> filter(Predicate<? super Method> predicate, boolean hard) {
+    public AnnotationReader<A, S> filter(Predicate<? super Method> predicate, boolean hard) {
         evaluated = false;
         pipeline = pipeline.filter(predicate);
         return this;
@@ -125,9 +133,8 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
         });
     }
 
-    //FIXME: Check whether S is necessary to be included for the consumer or not
     @Override
-    public <U> U mapFromClass(AnnotationDiscovery.AnnotativeConsumer<A, S, U> function) {
+    public <U> U mapFromClass(AnnotationProcessor<A, S, U> function) {
         if (isClassAnnotated()) {
             return function.accept(sClass.getAnnotation(annotationType), subject);
         }
@@ -142,20 +149,18 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
         return null;
     }
 
-    //FIXME Empty set more desirable than null?
-    // Absolutely yes. If we don't remove this method we should at least return empty.
     @Override
-    public <U> List<U> mapFromMethods(AnnotationDiscovery.AnnotativeConsumer<A, S, U> function) {
+    public <U> List<U> mapFromMethods(AnnotationProcessor<A, S, U> function) {
         if (hasFilteredMethods()) {
             return methodBuffer.stream()
                     .map(m -> function.accept(m.getAnnotation(annotationType), subject))
                     .collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
-    public Set<Method> methods() {
+    public Set<Method> getFilteredMethods() {
         evaluate();
         return methodBuffer;
     }
@@ -170,7 +175,7 @@ public class AnnotationUtilImpl<A extends Annotation, S> implements AnnotationUt
         return Arrays.stream(m.getAnnotations())
                 .filter(a -> aClass.isAssignableFrom(a.annotationType()))
                 .map(aClass::cast)
-                .collect(Collectors.toSet()); //TODO
+                .collect(Collectors.toSet());
     }
 
     @Override

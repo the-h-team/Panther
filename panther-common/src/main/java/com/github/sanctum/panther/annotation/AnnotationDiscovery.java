@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @deprecated The class has been replaced by {@link AnnotationMap}. Please use it for any new implementation.
  */
 @Deprecated
-public final class AnnotationDiscovery<T extends Annotation, R> implements Iterable<Method>, AnnotationUtil<T, R> {
+public final class AnnotationDiscovery<T extends Annotation, R> implements Iterable<Method>, AnnotationReader<T, R> {
 
     private final int count;
     private final Class<T> annotation;
@@ -75,7 +75,7 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
 
     @Override
     public void reset() {
-        methods().clear();
+        getFilteredMethods().clear();
     }
 
     /**
@@ -166,11 +166,11 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
      * <p>
      * This method gives you access to an annotation and the source object itself.
      *
-     * @param function The function.
      * @param <U>      The desired return value.
+     * @param function The function.
      * @return A value from an annotation.
      */
-    public <U> U mapFromClass(AnnotativeConsumer<T, R, U> function) {
+    public <U> U mapFromClass(AnnotationProcessor<T, R, U> function) {
         if (isPresent()) {
             return function.accept(rClass.getAnnotation(annotation), r);
         }
@@ -182,20 +182,17 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
      * <p>
      * This method gives you access to an annotation and the source object itself.
      *
-     * @param function The function.
      * @param <U>      The desired return value.
+     * @param function The function.
      * @return A value from an annotation.
      */
-    public <U> List<U> mapFromMethods(AnnotativeConsumer<T, R, U> function) {
+    public <U> List<U> mapFromMethods(AnnotationProcessor<T, R, U> function) {
         List<U> list = new ArrayList<>();
         ifPresent((t, method) -> list.add(function.accept(t, r)));
         return list;
     }
 
-    /**
-     * @return List's all filtered methods.
-     */
-    public Set<Method> methods() {
+    public Set<Method> getFilteredMethods() {
         return methods;
     }
 
@@ -238,18 +235,23 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
     @NotNull
     @Override
     public Iterator<Method> iterator() {
-        return methods().iterator();
+        return getFilteredMethods().iterator();
     }
 
     @Override
     public Spliterator<Method> spliterator() {
-        return methods().spliterator();
+        return getFilteredMethods().spliterator();
     }
 
-    @FunctionalInterface
-    public interface AnnotativeConsumer<U extends Annotation, R, V> {
-
-        V accept(U annotation, R source);
+    /**
+     * Mirror of {@link AnnotationProcessor}
+     * <p>
+     * Remove usages asap, the support for this will be discontinued soon
+     *
+     * @deprecated Only for compatibility reasons.
+     */
+    @Deprecated
+    public interface AnnotativeConsumer<U extends Annotation, R, V> extends AnnotationProcessor<U, R, V> {
 
     }
 
