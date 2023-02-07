@@ -10,8 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO package-private? (remove public modifier)
-public class AnnotationMapImpl<T> implements AnnotationMap<T> {
+class AnnotationMapImpl<T> implements AnnotationMap<T> {
 
     final T subject;
     final Map<Class<?>, Node> annotationByType = new HashMap<>();

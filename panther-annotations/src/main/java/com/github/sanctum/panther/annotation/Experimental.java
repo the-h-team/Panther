@@ -2,11 +2,7 @@ package com.github.sanctum.panther.annotation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Indicates that an API member (a class, method, parameter or field) is not in
@@ -40,12 +36,12 @@ public @interface Experimental {
 	@NotNull String dueTo() default "";
 
 	/**
-	 * Whether this element is at risk of removal.
+	 * Checks whether this element is at risk of removal.
 	 * <p>
 	 * What exactly is meant by "at risk of removal" is left to the developer.
 	 * You may refer to the developer comment (if present) for details.
 	 *
-	 * @return true if the element is at risk of removal
+	 * @return true when the element is at risk of removal
 	 */
 	boolean atRisk() default false;
 
