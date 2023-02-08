@@ -8,19 +8,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-// rename class to reflect Method-specific utility?
-// It also holds class-specific code, see #mapFromClass etc.
-//I think the current name is fine tho. rigob.
-
 /**
- * Processes annotations on the methods of a class.
- * <p>Annotations of a given supertype are processed. The results can be
- * filtered and sorted.
+ * Detects annotations on a class and its methods and caches them for further processing.
+ * <p>
+ * The whole set of discovered methods is saved and a modifiable copy can be filtered and sorted arbitrarily.
+ * Only Annotations of a given type are taken into account. If you need to access multiple annotation types at once,
+ * consider using an {@link AnnotationMap} for extended utility.
  *
  * @param <A> the annotation supertype to process
  * @param <S> the static type of the class being processed
+ * @see AnnotationMap
  */
 public interface AnnotationReader<A extends Annotation, S> extends Iterable<Method> {
 
@@ -74,46 +74,84 @@ public interface AnnotationReader<A extends Annotation, S> extends Iterable<Meth
      */
     AnnotationReader<A, S> filter(Predicate<? super Method> predicate, boolean hard);
 
-
     /**
-     * Determines if any annotated methods are present.
+     * Determines whether the annotation can be found anywhere in the source.
      *
-     * @return true if the desired annotation is present on any method
+     * @return true when the desired annotation is present on any method or on the class
+     * @see #isClassAnnotated()
+     * @see #isMethodAnnotated()
+     * @see #hasFilteredMethods()
+     * @deprecated This method provides no information where the annotation got found and has been split to more detailed checks
      */
     boolean isPresent();
 
+    /**
+     * Checks whether the class holds the annotation.
+     *
+     * @return true when the class holds the annotation
+     */
+    boolean isClassAnnotated();
+
+    /**
+     * Checks whether any method in the class holds the annotation.
+     *
+     * @return true when the annotation could be found
+     */
+    boolean isMethodAnnotated();
+
+    /**
+     * Checks whether the current filters have lead to any results.
+     *
+     * @return true when filtered method collection is not empty.
+     */
+    boolean hasFilteredMethods();
 
     /**
      * Runs an operation with every annotated method found.
      *
      * @param function an operation
-     * @deprecated misleading name, renamed to {@link }TODO
+     * @deprecated misleading name, renamed to {@link #forEachFilteredMethod(BiConsumer)}
      */
-    void ifPresent(BiConsumer<A, Method> function); // FIXME use ? super A
-
+    default void ifPresent(BiConsumer<? super A, Method> function) {
+        forEachFilteredMethod(function);
+    }
 
     /**
-     * Checks the cl
+     * Runs an operation with every annotated method found.
      *
-     * @param <U>      the desired return type.
+     * @param function an operation
+     */
+    void forEachFilteredMethod(BiConsumer<? super A, Method> function);
+
+    /**
+     * Checks the class for the annotation and processes to a result.
+     *
+     * @param <R>      the desired return type.
      * @param function the processing function.
      * @return the processing results, or null if the annotation wasn't present.
      */
-    <U> U mapFromClass(AnnotationProcessor<A, S, U> function);
-
+    <R> R mapFromClass(AnnotationProcessor<A, S, R> function);
 
     /**
-     * FIXME remove or re-doc
-     * FIXME using deprecated components as parameter, either pull or replace them
-     * Get information from the leading source objects methods found with the specified annotation.
-     * <p>
-     * This method gives you access to an annotation and the source object itself.
+     * Checks the class for the annotation and processes to a result.
      *
-     * @param <U>      The desired return value.
+     * @param <R>      the desired return type.
+     * @param function the processing function.
+     * @return the processing results, or null if the annotation wasn't present.
+     */
+    <R> R mapFromClass(Function<A, R> function);
+
+    /**
+     * Takes all methods in the filter buffer, extracts the annotations and processes them with the given function.
+     * <p>
+     * The processing function will get passed the annotation and the holding object for each occurrence.
+     * Note that the method itself won't be easily accessible.
+     *
+     * @param <R>      The desired return value.
      * @param function The function.
      * @return A value from an annotation.
      */
-    <U> List<U> mapFromMethods(AnnotationProcessor<A, S, U> function);
+    <R> List<R> mapFromMethods(AnnotationProcessor<A, S, R> function);
 
     /**
      * Resets all filtering and sorting settings.
@@ -123,11 +161,10 @@ public interface AnnotationReader<A extends Annotation, S> extends Iterable<Meth
     /**
      * Provides the currently buffered methods.
      *
-     * @return a set of methods. If a comparator was provided by {@link #sort(Comparator),
+     * @return a set of methods. If a comparator was provided by {@link #sort(Comparator)},
      * the set may be ordered at least statically.
      */
     Set<Method> getFilteredMethods();
-
 
     /**
      * Reads all matching annotations from a method.

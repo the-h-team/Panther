@@ -5,7 +5,7 @@ import java.lang.annotation.Annotation;
 /**
  * Represents a mapping function to be performed with an annotation and its holding object.
  * <p>
- * This is a functional interface whose functional method is {@link #accept(Annotation, Object)}
+ * This is a functional interface whose functional method is {@link #apply(Annotation, Object)}
  *
  * @param <A> The annotation type
  * @param <S> The subject type that holds the annotation
@@ -21,6 +21,6 @@ public interface AnnotationProcessor<A extends Annotation, S, R> {
      * @param source     the holding object
      * @return the processing result
      */
-    R accept(A annotation, S source);
+    R apply(A annotation, S source);
 
 }

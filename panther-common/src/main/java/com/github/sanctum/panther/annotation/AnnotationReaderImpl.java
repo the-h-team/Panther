@@ -8,10 +8,10 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// FIXME pull methods up to superinterface
 class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<A, S> {
 
     private final int count;
@@ -64,15 +64,19 @@ class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<
             return;
         }
         if (comparator != null) {
-            methodBuffer = pipeline.collect(Collectors.toCollection(this::provideTreeSet));
+            collectToSet(this::provideSortedSet);
         } else {
-            methodBuffer = pipeline.collect(Collectors.toCollection(LinkedHashSet::new));
+            collectToSet(LinkedHashSet::new);
         }
         evaluated = true;
         pipeline = methodBuffer.stream();
     }
 
-    private Set<Method> provideTreeSet() {
+    private void collectToSet(Supplier<Set<Method>> collectionSupplier) {
+        methodBuffer = pipeline.collect(Collectors.toCollection(collectionSupplier));
+    }
+
+    private Set<Method> provideSortedSet() {
         return new TreeSet<>(comparator);
     }
 
@@ -90,9 +94,6 @@ class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<
         return this;
     }
 
-    /*FIXME: The hard parameter is unnecessary in current construct, check whether it is still wanted.
-     * If so, the total collection needs to be changed into a Map<Boolean,Method> for being able to get accessible methods easily
-     */
     @Override
     public AnnotationReader<A, S> filter(Predicate<? super Method> predicate, boolean hard) {
         evaluated = false;
@@ -100,29 +101,29 @@ class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<
         return this;
     }
 
-
     @Override
     public boolean isPresent() {
         return isClassAnnotated() || isMethodAnnotated();
     }
 
-    //FIXME Candidate for superinterface
+    @Override
     public boolean isClassAnnotated() {
         return sClass.isAnnotationPresent(annotationType);
     }
 
-    //FIXME Candidate for superinterface
+    @Override
     public boolean isMethodAnnotated() {
         return !allAnnotatedMethods.isEmpty();
     }
 
-    //FIXME Candidate for superinterface
+    @Override
     public boolean hasFilteredMethods() {
+        evaluate();
         return !methodBuffer.isEmpty();
     }
 
     @Override
-    public void ifPresent(BiConsumer<A, Method> function) {
+    public void forEachFilteredMethod(BiConsumer<? super A, Method> function) {
         evaluate();
         methodBuffer.forEach(method -> {
             for (Annotation annotation : method.getAnnotations()) {
@@ -136,12 +137,13 @@ class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<
     @Override
     public <U> U mapFromClass(AnnotationProcessor<A, S, U> function) {
         if (isClassAnnotated()) {
-            return function.accept(sClass.getAnnotation(annotationType), subject);
+            return function.apply(sClass.getAnnotation(annotationType), subject);
         }
         return null;
     }
 
-    //FIXME Candidate for superinterface
+
+    @Override
     public <U> U mapFromClass(Function<A, U> function) {
         if (isClassAnnotated()) {
             return function.apply(sClass.getAnnotation(annotationType));
@@ -153,7 +155,7 @@ class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<
     public <U> List<U> mapFromMethods(AnnotationProcessor<A, S, U> function) {
         if (hasFilteredMethods()) {
             return methodBuffer.stream()
-                    .map(m -> function.accept(m.getAnnotation(annotationType), subject))
+                    .map(m -> function.apply(m.getAnnotation(annotationType), subject))
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
@@ -170,8 +172,9 @@ class AnnotationReaderImpl<A extends Annotation, S> implements AnnotationReader<
         return read(method, annotationType);
     }
 
-    //FIXME Candidate for superinterface
-    public static <A extends Annotation> Set<A> read(Method m, Class<A> aClass) {
+    //statically bound to interface method, should be checked whether having use cases and being necessary
+    //this is a part of the implementation and needs to be hidden either way
+    static <A extends Annotation> Set<A> read(Method m, Class<A> aClass) {
         return Arrays.stream(m.getAnnotations())
                 .filter(a -> aClass.isAssignableFrom(a.annotationType()))
                 .map(aClass::cast)
