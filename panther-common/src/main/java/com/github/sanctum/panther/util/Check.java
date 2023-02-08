@@ -90,18 +90,18 @@ public class Check {
 		if (discovery.isPresent()) {
 			if (warning) {
 				message.info("- Warning scan found (" + discovery.count() + ") methods at checkout.");
-				discovery.ifPresent((r, m) -> message.warning(function.accept(r, m)));
+				discovery.ifPresent((r, m) -> message.warning(function.apply(r, m)));
 			} else {
 				message.info("- Info scan found (" + discovery.count() + ") methods at checkout.");
-				discovery.ifPresent((r, m) -> message.info(function.accept(r, m)));
+				discovery.ifPresent((r, m) -> message.info(function.apply(r, m)));
 			}
 		} else {
 			if (t.getClass().isAnnotationPresent(annotative)) {
 				A e = t.getClass().getAnnotation(annotative);
 				if (warning) {
-					message.warning(function.accept(e, t.getClass().getMethods()[0]));
+					message.warning(function.apply(e, t.getClass().getMethods()[0]));
 				} else {
-					message.info(function.accept(e, t.getClass().getMethods()[0]));
+					message.info(function.apply(e, t.getClass().getMethods()[0]));
 				}
 			}
 		}

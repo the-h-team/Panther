@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
  *
  * @param <T> A type of annotation.
  * @param <R> The class type to be checked for annotations.
- * @deprecated The class has been replaced by {@link AnnotationMap}. Please use it for any new implementation.
+ * @deprecated The class has been replaced by {@link AnnotationReader} and {@link AnnotationMap}.
+ * Please use them for any new implementation.
  */
 @Deprecated
 public final class AnnotationDiscovery<T extends Annotation, R> implements Iterable<Method>, AnnotationReader<T, R> {
@@ -144,12 +146,24 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
         return methods.isEmpty() ? this.rClass.isAnnotationPresent(annotation) : count > 0;
     }
 
-    /**
-     * Run an operation with every annotated method found.
-     *
-     * @param function The function.
-     */
-    public void ifPresent(BiConsumer<T, Method> function) {
+    @Override
+    public boolean isClassAnnotated() {
+        return false;
+    }
+
+    @Override
+    public boolean isMethodAnnotated() {
+        return count > 0;
+    }
+
+    @Override
+    public boolean hasFilteredMethods() {
+        return !methods.isEmpty();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void forEachFilteredMethod(BiConsumer<? super T, Method> function) {
         if (isPresent()) {
             methods.forEach(m -> {
                 for (Annotation a : m.getAnnotations()) {
@@ -172,8 +186,13 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
      */
     public <U> U mapFromClass(AnnotationProcessor<T, R, U> function) {
         if (isPresent()) {
-            return function.accept(rClass.getAnnotation(annotation), r);
+            return function.apply(rClass.getAnnotation(annotation), r);
         }
+        return null;
+    }
+
+    @Override
+    public <R1> R1 mapFromClass(Function<T, R1> function) {
         return null;
     }
 
@@ -188,7 +207,7 @@ public final class AnnotationDiscovery<T extends Annotation, R> implements Itera
      */
     public <U> List<U> mapFromMethods(AnnotationProcessor<T, R, U> function) {
         List<U> list = new ArrayList<>();
-        ifPresent((t, method) -> list.add(function.accept(t, r)));
+        ifPresent((t, method) -> list.add(function.apply(t, r)));
         return list;
     }
 

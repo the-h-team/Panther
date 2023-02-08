@@ -8,8 +8,10 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * Represents a Read-Only-Map for Annotations discovered on a certain subject.
+ * Represents a Read-Only-Map for Annotations discovered on a subject.
+ * <p>
  * This will scan methods and the class itself.
+ * If you only need to check for a certain annotation type, consider using the more lightweight {@link AnnotationReader}
  */
 public interface AnnotationMap<T> {
 
