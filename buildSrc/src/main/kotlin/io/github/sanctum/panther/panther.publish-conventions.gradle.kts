@@ -20,9 +20,18 @@ afterEvaluate {
         publications {
             create<MavenPublication>(name) {
                 pom {
-                    description.set(project.description!!)
-                    url.set(project.properties["url"] as String)
-                    inceptionYear.set(project.properties["inceptionYear"] as String)
+                    description.set(
+                        project.description.takeIf { it != rootProject.description } ?:
+                        throw IllegalStateException("Set the project description in ${project.projectDir.name}/build.gradle.kts before activating publishing.")
+                    )
+                    url.set(
+                        project.properties["url"] as String? ?:
+                        throw IllegalStateException("Set the project URL as the Gradle project property 'url' before activating publishing.")
+                    )
+                    inceptionYear.set(
+                        project.properties["inceptionYear"] as String? ?:
+                        throw IllegalStateException("Set the project inception year as the Gradle project property 'inceptionYear' before activating publishing.")
+                    )
                     licenses {
                         license {
                             name.set("Apache License 2.0")
