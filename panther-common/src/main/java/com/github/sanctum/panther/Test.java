@@ -1,7 +1,6 @@
 package com.github.sanctum.panther;
 
 import com.github.sanctum.panther.event.Vent;
-import com.github.sanctum.panther.file.Configurable;
 import com.github.sanctum.panther.file.JsonAdapter;
 import com.github.sanctum.panther.file.Node;
 import com.google.gson.JsonElement;
@@ -25,6 +24,7 @@ public final class Test implements JsonAdapter<Test>, Vent.Host {
 	}
 
 	public static void main(String[] args) throws Exception {
+		/*
 		Test tes = new Test();
 		Configurable.Editor editor = Configurable.view(tes).get("test", Configurable.Type.JSON);
 		editor.write(t -> {
@@ -35,6 +35,7 @@ public final class Test implements JsonAdapter<Test>, Vent.Host {
 		Configurable.Editor editor2 = Configurable.view(tes).get("test", Configurable.Type.JSON);
 
 		System.out.println("Done.");
+		 */
 	}
 
 	@Override

@@ -87,7 +87,7 @@ public interface PasteManager extends Service {
 							public String[] getAll() {
 								String response = "Unable to receive proper response.";
 								try {
-									String requestURL = id.contains("http") && !id.contains("raw") ? id.replace("hastebin", "hastebin/raw") : "https://www.toptal.com/developers/hastebin/raw/" + id;
+									String requestURL = id.contains("http") && !id.contains("raw") ? id.replace("hastebin.skyra.pw", "hastebin.skyra.pw/raw") : "https://hastebin.skyra.pw/raw/" + id;
 									URL url = new URL(requestURL);
 									HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 									conn.setDoInput(true);
@@ -119,19 +119,20 @@ public interface PasteManager extends Service {
 								byte[] postData = builder.toString().getBytes(StandardCharsets.UTF_8);
 								int postDataLength = postData.length;
 
-								String requestURL = "https://www.toptal.com/developers/hastebin/documents";
-								URL url = new URL(requestURL);
+								URL url = new URL("https://hastebin.skyra.pw/documents");
 								HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 								conn.setDoOutput(true);
 								conn.setInstanceFollowRedirects(false);
 								conn.setRequestMethod("POST");
 								conn.setRequestProperty("User-Agent", "Hastebin Java Api");
 								conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+								conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 								conn.setUseCaches(false);
 								DataOutputStream wr;
 								try {
 									wr = new DataOutputStream(conn.getOutputStream());
 									wr.write(postData);
+									wr.flush();
 									BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 									response = reader.readLine();
 								} catch (IOException e) {
@@ -141,7 +142,7 @@ public interface PasteManager extends Service {
 								if (response.contains("\"key\"")) {
 									response = response.substring(response.indexOf(":") + 2, response.length() - 2);
 
-									String postURL = getOptions().isRaw() ? "https://www.toptal.com/developers/hastebin/raw/" : "https://www.toptal.com/developers/hastebin/";
+									String postURL = getOptions().isRaw() ? "https://hastebin.skyra.pw/raw/" : "https://hastebin.skyra.pw/";
 									response = postURL + response;
 								}
 							} catch (Exception ex) {
@@ -163,7 +164,7 @@ public interface PasteManager extends Service {
 								byte[] postData = builder.toString().getBytes(StandardCharsets.UTF_8);
 								int postDataLength = postData.length;
 
-								String requestURL = "https://www.toptal.com/developers/hastebin/documents";
+								String requestURL = "https://hastebin.skyra.pw/documents";
 								URL url = new URL(requestURL);
 								HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 								conn.setDoOutput(true);
@@ -171,11 +172,13 @@ public interface PasteManager extends Service {
 								conn.setRequestMethod("POST");
 								conn.setRequestProperty("User-Agent", "Hastebin Java Api");
 								conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+								conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 								conn.setUseCaches(false);
 								DataOutputStream wr;
 								try {
 									wr = new DataOutputStream(conn.getOutputStream());
 									wr.write(postData);
+									wr.flush();
 									BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 									response = reader.readLine();
 								} catch (IOException e) {
@@ -185,7 +188,7 @@ public interface PasteManager extends Service {
 								if (response.contains("\"key\"")) {
 									response = response.substring(response.indexOf(":") + 2, response.length() - 2);
 
-									String postURL = getOptions().isRaw() ? "https://www.toptal.com/developers/hastebin/raw/" : "https://www.toptal.com/developers/hastebin/";
+									String postURL = getOptions().isRaw() ? "https://hastebin.skyra.pw/raw/" : "https://hastebin.skyra.pw/";
 									response = postURL + response;
 								}
 							} catch (Exception ex) {
