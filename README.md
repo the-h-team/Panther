@@ -1,6 +1,8 @@
 # Panther
 A Java library for an enhanced workflow.
 
+[![](https://jitpack.io/v/the-h-team/Panther.svg)](https://jitpack.io/#the-h-team/Panther)
+
 ---
 
 ## Modules
