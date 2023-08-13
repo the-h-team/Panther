@@ -40,4 +40,14 @@ public final class PantherList<E> extends PantherCollectionBase<E> {
 		if (tail == null) return null;
 		return tail.data;
 	}
+
+
+	@Override
+	public boolean addAll(Iterable<E> iterable) {
+		for (E e : iterable) {
+			add(e);
+		}
+		return true;
+	}
+
 }
