@@ -2,6 +2,7 @@ package com.github.sanctum.panther.file;
 
 import com.github.sanctum.panther.container.PantherEntryMap;
 import com.github.sanctum.panther.container.PantherMap;
+import com.github.sanctum.panther.executable.Command;
 import com.github.sanctum.panther.util.EasyTypeAdapter;
 import com.github.sanctum.panther.util.MapDecompression;
 import com.github.sanctum.panther.util.PantherLogger;

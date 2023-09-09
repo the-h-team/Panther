@@ -31,6 +31,7 @@ dependencies {
         // don't drag in httpcore5-h2 because we aren't using it
         exclude(group = "org.apache.httpcomponents.core5", module = "httpcore5-h2")
     }
+    implementation("org.jetbrains:annotations:20.1.0")
 }
 
 description = "The main library of Panther"

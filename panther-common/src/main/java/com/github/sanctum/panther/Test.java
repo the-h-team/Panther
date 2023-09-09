@@ -1,6 +1,10 @@
 package com.github.sanctum.panther;
 
 import com.github.sanctum.panther.event.Vent;
+import com.github.sanctum.panther.executable.Command;
+import com.github.sanctum.panther.executable.CommandProcessor;
+import com.github.sanctum.panther.executable.Executable;
+import com.github.sanctum.panther.executable.TestExecutable;
 import com.github.sanctum.panther.file.JsonAdapter;
 import com.github.sanctum.panther.file.Node;
 import com.google.gson.JsonElement;
@@ -24,18 +28,16 @@ public final class Test implements JsonAdapter<Test>, Vent.Host {
 	}
 
 	public static void main(String[] args) throws Exception {
-		/*
-		Test tes = new Test();
-		Configurable.Editor editor = Configurable.view(tes).get("test", Configurable.Type.JSON);
-		editor.write(t -> {
-			t.set("Steve.farts", 32);
-			t.set("Steve.eggs", 4);
-			t.set("Steve.bio", "Haha");
+		CommandProcessor processor = new CommandProcessor() {
+		};
+		processor.register(new TestExecutable());
+		Executable.Inquiry inquiry = processor.inquire(Command.Context.of("clan base"));
+		inquiry.setUnknownHandler(context -> {
+			System.out.println("You used an unknown clan sub-command. Please refer to 'clan help'");
 		});
-		Configurable.Editor editor2 = Configurable.view(tes).get("test", Configurable.Type.JSON);
-
-		System.out.println("Done.");
-		 */
+		if (inquiry.canRun()) {
+			inquiry.run();
+		}
 	}
 
 	@Override
