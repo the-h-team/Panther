@@ -3,6 +3,7 @@
  */
 
 rootProject.name = "Panther"
+include(":panther-annotations")
 include(":panther-placeholders")
 include(":panther-containers")
 include(":panther-common")

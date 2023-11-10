@@ -1,7 +1,6 @@
 package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.Test;
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.annotation.Ordinal;
 import com.github.sanctum.panther.file.Generic;
 import com.github.sanctum.panther.file.Node;
@@ -28,7 +27,7 @@ public class GenericTestExample implements Generic {
 	}
 
 	@Ordinal(20)
-	@Note("It's imperative that you have this in your class!")
+	// @Note("It's imperative that you have this in your class!")
 	protected void setNode(@NotNull Node node) {
 		this.node = node;
 	}

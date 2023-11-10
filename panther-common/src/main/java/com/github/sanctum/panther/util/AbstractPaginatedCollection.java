@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Note;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,18 +46,18 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 		this.collection = Arrays.asList(t);
 	}
 
-	@Note("It is noted that this collection is modifiable and empty and implied to the type casting")
+	// "It is noted that this collection is modifiable and empty and implied to the type casting" FIXME < as doc or remove
 	public static <T> AbstractPaginatedCollection<T> emptyCollection() {
 		return new PantherPagination<>();
 	}
 
 	@SafeVarargs
-	@Note("It is noted that this collection is modifiable and contains the following elements")
+	// "It is noted that this collection is modifiable and contains the following elements" FIXME < as doc or remove
 	public static <T> AbstractPaginatedCollection<T> of(T... t) {
 		return new PantherPagination<>(t);
 	}
 
-	@Note("It is noted that this collection is modifiable and contains the following elements")
+	// "It is noted that this collection is modifiable and contains the following elements" FIXME < as doc or remove
 	public static <T> AbstractPaginatedCollection<T> of(Collection<T> collection) {
 		return new PantherPagination<>(collection);
 	}
@@ -240,10 +239,11 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
+	 * <p>
+	 * For this subclass, you can use integers to check for a specific page!
 	 */
 	@Override
-	@Note("Use this method to also check if this collection contains a specific page!")
 	public boolean contains(Object o) {
 		if (o instanceof Integer) {
 			return set.stream().filter(ts -> ts.getNumber() == ((int)o)).findFirst().orElse(null) != null;
@@ -291,12 +291,15 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 	}
 
 	/**
-	 * Get a page from this collection.
+	 * Gets a page from this collection.
+	 * <p>
+	 * <b>This works differently than the normal get index method!</b>
+	 * Make sure you call {@link AbstractPaginatedCollection#contains(Object)}
+	 * first on the index or 'page' you want.
 	 *
-	 * @param index The page to get.
-	 * @return An existing page or a new one skipping nullity.
+	 * @param index the page to get
+	 * @return an existing page or a new one skipping nullity.
 	 */
-	@Note("This works differently than the normal get index method! Make sure you call AbstractPaginatedCollection#contains(Object) first on the index or 'page' you want.")
 	public @NotNull Page<T> get(int index) {
 		if (set.isEmpty() && !collection.isEmpty()) {
 			reorder().deploy().submit().join();
@@ -309,10 +312,11 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 	}
 
 	/**
-	 * @inheritDoc
+	 * Adds a custom page to this pagination collection.
+	 * <p>
+	 * {@inheritDoc}
 	 */
 	@Override
-	@Note("Add a custom page to this pagination collection")
 	public boolean add(Page<T> tPage) {
 		if (set.isEmpty() && !collection.isEmpty()) {
 			reorder().deploy().submit().join();
@@ -321,9 +325,10 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 	}
 
 	/**
+	 * Adds a custom page to this pagination collection.
+	 *
 	 * @see AbstractPaginatedCollection#add(Page) 
 	 */
-	@Note("Add a custom page to this pagination collection")
 	public boolean add(Consumer<Page<T>> consumer, int page) {
 		Page<T> newIn = new Page.Impl<>(this, page);
 		consumer.accept(newIn);
@@ -353,10 +358,11 @@ public abstract class AbstractPaginatedCollection<T> implements Collection<Page<
 	}
 
 	/**
-	 * @inheritDoc
+	 * Removes a page from this pagination collection.
+	 * <p>
+	 * {@inheritDoc}
 	 */
 	@Override
-	@Note("Add remove a page from this pagination collection")
 	public boolean remove(Object o) {
 		if (set.isEmpty() && !collection.isEmpty()) {
 			reorder().deploy().submit().join();

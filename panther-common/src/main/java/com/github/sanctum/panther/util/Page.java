@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherCollectors;
 import com.github.sanctum.panther.container.PantherList;
@@ -71,7 +70,7 @@ public interface Page<T> extends Iterable<T> {
 	boolean contains(T t);
 
 	/**
-	 * Reorder this specific page by its parents' filtration sequences.
+	 * Reorders this specific page by its parents' filtration sequences.
 	 *
 	 * <p>The use of this will allow you to delve further and apply ordering on specific pages but
 	 * at the same time making it mess up the <strong>over-all</strong> ordering, if that's the case
@@ -79,7 +78,8 @@ public interface Page<T> extends Iterable<T> {
 	 *
 	 * @return The same page reordered.
 	 */
-	@Note("This is an optional method, you should nether need to use it but instead call the main AbstractPaginatedCollecction#reorder() method.")
+	// This is an optional method, you should never need to use it FIXME why not?
+	// and instead call the main AbstractPaginatedCollection#reorder() method.
 	Deployable<Page<T>> reorder();
 
 	default boolean isEmpty() {
@@ -99,7 +99,6 @@ public interface Page<T> extends Iterable<T> {
 		}
 
 		@Override
-		@Note("Labyrinth impl is modifiable by default. (elements can be added)")
 		public boolean isModifiable() {
 			return true;
 		}

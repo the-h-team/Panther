@@ -2,6 +2,7 @@ package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.annotation.AnnotationDiscovery;
 import com.github.sanctum.panther.annotation.Ordinal;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -223,7 +224,7 @@ public abstract class OrdinalProcedure<E> {
 
 	private GenericOrdinalElement get(E element, int ordinal) {
 		AnnotationDiscovery<Ordinal, E> discovery = AnnotationDiscovery.of(Ordinal.class, element).filter(true);
-		return discovery.methods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
+		return discovery.getFilteredMethods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
 			try {
 				return new GenericOrdinalElement(method.invoke(element));
 			} catch (Exception exception) {
@@ -242,7 +243,7 @@ public abstract class OrdinalProcedure<E> {
 
 	private GenericOrdinalElement get(E element, int ordinal, Object... args) {
 		AnnotationDiscovery<Ordinal, E> discovery = AnnotationDiscovery.of(Ordinal.class, element).filter(true);
-		return discovery.methods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
+		return discovery.getFilteredMethods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
 			try {
 				return new GenericOrdinalElement(method.invoke(element, args));
 			} catch (Exception exception) {
@@ -401,7 +402,7 @@ public abstract class OrdinalProcedure<E> {
 	 */
 	public static <E> GenericOrdinalElement select(E element, int ordinal) {
 		AnnotationDiscovery<Ordinal, E> discovery = AnnotationDiscovery.of(Ordinal.class, element).filter(true);
-		return discovery.methods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
+		return discovery.getFilteredMethods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
 			try {
 				return new GenericOrdinalElement(method.invoke(element));
 			} catch (Exception exception) {
@@ -429,7 +430,7 @@ public abstract class OrdinalProcedure<E> {
 	 */
 	public static <E> GenericOrdinalElement select(E element, int ordinal, Object... args) {
 		AnnotationDiscovery<Ordinal, E> discovery = AnnotationDiscovery.of(Ordinal.class, element).filter(true);
-		return discovery.methods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
+		return discovery.getFilteredMethods().stream().filter(m -> m.getAnnotation(Ordinal.class).value() == ordinal).findFirst().map(method -> {
 			try {
 				return new GenericOrdinalElement(method.invoke(element, args));
 			} catch (Exception exception) {

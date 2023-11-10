@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.recursive;
 
-import com.github.sanctum.panther.annotation.See;
 import com.github.sanctum.panther.util.MapDecompression;
 import com.github.sanctum.panther.util.PantherLogger;
 import java.lang.annotation.Documented;
@@ -11,9 +10,14 @@ import java.lang.annotation.Target;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * An interface used for marking recursively used classes. Can be cached using {@link ServiceFactory}
+ * An interface used for marking recursively used classes.
+ * <p>
+ * Services can be cached using {@link ServiceFactory}.
+ *
+ * @since 1.0.0
+ * @see PantherLogger
+ * @see MapDecompression
  */
-@See({PantherLogger.class, MapDecompression.class})
 public interface Service {
 
 	/**

@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherList;
 import com.github.sanctum.panther.container.PantherQueue;
@@ -25,7 +24,9 @@ public class ResourceLookup {
 		this.classes = new PantherQueue<>();
 	}
 
-	@Note("Queues all classes from a specific base package.")
+	/**
+	 * Queues all classes from a specific base package. FIXME complete doc
+	 */
 	public ResourceLookup(@NotNull ClassLoader loader, @NotNull String packageName) {
 		this(loader);
 		getClasses(packageName);

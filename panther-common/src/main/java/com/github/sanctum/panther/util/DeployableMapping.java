@@ -1,13 +1,12 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.Comment;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
-@Comment("A delegate to deployable interfacing, conforming one object type into another.")
+// A delegate to deployable interfacing, conforming one object type into another. TODO < this as javadoc
 public final class DeployableMapping<R> implements Deployable<R> {
 
 	private final Function<? super Object, ? extends R> function;

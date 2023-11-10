@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.container;
 
-import com.github.sanctum.panther.annotation.Note;
 import com.github.sanctum.panther.annotation.Ordinal;
 import com.github.sanctum.panther.util.Task;
 import com.github.sanctum.panther.util.TaskChain;
@@ -18,8 +17,9 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see PantherCollection
  * @param <E> The type of element this queue is for
+ * @implNote All queue modifications run on an in-daemon asynchronous task scheduler with an execution delay of 50 milliseconds.
  */
-@Note("All queue modifications run on an in-daemon asynchronous task scheduler with an execution delay of 50 milliseconds.")
+// TODO verify implNote is sufficient here; did we need the comment at runtime?
 public final class PantherQueue<E> extends PantherCollectionBase<E> {
 
 	final TaskChain chain = TaskChain.getAsynchronous();

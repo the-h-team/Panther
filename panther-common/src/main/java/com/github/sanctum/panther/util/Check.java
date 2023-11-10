@@ -1,15 +1,13 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.AnnotationDiscovery;
-import com.github.sanctum.panther.annotation.Experimental;
-import com.github.sanctum.panther.annotation.Json;
-import com.github.sanctum.panther.annotation.Note;
+import com.github.sanctum.panther.annotation.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.logging.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class Check {
 
@@ -80,11 +78,11 @@ public class Check {
 		return t;
 	}
 
-	public static <A extends Annotation, T> @NotNull T forAnnotation(T t, Class<A> annotative, AnnotationDiscovery.AnnotativeConsumer<A, Method, String> function) {
+	public static <A extends Annotation, T> @NotNull T forAnnotation(T t, Class<A> annotative, AnnotationProcessor<A, Method, String> function) {
 		return forAnnotation(t, annotative, function, false);
 	}
 
-	public static <A extends Annotation, T> @NotNull T forAnnotation(T t, Class<A> annotative, AnnotationDiscovery.AnnotativeConsumer<A, Method, String> function, boolean warning) {
+	public static <A extends Annotation, T> @NotNull T forAnnotation(T t, Class<A> annotative, AnnotationProcessor<A, Method, String> function, boolean warning) {
 		if (t == null) throw new IllegalArgumentException("Value cannot be null!");
 		AnnotationDiscovery<A, Object> discovery = AnnotationDiscovery.of(annotative, t);
 		discovery.filter(m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(annotative)) || m.isAnnotationPresent(annotative));
@@ -92,18 +90,18 @@ public class Check {
 		if (discovery.isPresent()) {
 			if (warning) {
 				message.info("- Warning scan found (" + discovery.count() + ") methods at checkout.");
-				discovery.ifPresent((r, m) -> message.warning(function.accept(r, m)));
+				discovery.ifPresent((r, m) -> message.warning(function.apply(r, m)));
 			} else {
 				message.info("- Info scan found (" + discovery.count() + ") methods at checkout.");
-				discovery.ifPresent((r, m) -> message.info(function.accept(r, m)));
+				discovery.ifPresent((r, m) -> message.info(function.apply(r, m)));
 			}
 		} else {
 			if (t.getClass().isAnnotationPresent(annotative)) {
 				A e = t.getClass().getAnnotation(annotative);
 				if (warning) {
-					message.warning(function.accept(e, t.getClass().getMethods()[0]));
+					message.warning(function.apply(e, t.getClass().getMethods()[0]));
 				} else {
-					message.info(function.accept(e, t.getClass().getMethods()[0]));
+					message.info(function.apply(e, t.getClass().getMethods()[0]));
 				}
 			}
 		}

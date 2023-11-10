@@ -1,6 +1,5 @@
 package com.github.sanctum.panther.paste.type;
 
-import com.github.sanctum.panther.annotation.Note;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,7 +14,10 @@ public interface Hastebin extends Manipulable {
 	 * @return The options object for this hastebin connection.
 	 */
 	@Override
-	@Note("There are very few options for hastebin most of the provision is empty.")
+	// There are very few options for hastebin most of the provision is empty.
+	// FIXME
+	//  - doc which ones do apply
+	//  - reduce PasteOptions to only those that apply
 	@NotNull HasteOptions getOptions();
 
 }
