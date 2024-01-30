@@ -15,10 +15,35 @@ tasks.withType<Javadoc> {
     options.quiet()
 }
 
+// un-wire sourcesJar and javadocJar from normal assemble
+tasks.named("assemble") {
+    setDependsOn(dependsOn.filterNot {
+        (it as? Named)?.name in listOf("sourcesJar", "javadocJar")
+    })
+}
+
+tasks.withType<AbstractPublishToMaven> {
+    dependsOn.add(tasks.named("sourcesJar"))
+    dependsOn.add(tasks.named("javadocJar"))
+}
+
 afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>(name) {
+                // if are on an Actions runner, set up GitHub Packages
+                if (System.getenv("GITHUB_ACTIONS") == "true") {
+                    repositories {
+                        maven {
+                            name = "GitHubPackages"
+                            url = uri("https://maven.pkg.github.com/the-h-team/Panther")
+                            credentials {
+                                username = System.getenv("GITHUB_ACTOR")
+                                password = System.getenv("GITHUB_TOKEN")
+                            }
+                        }
+                    }
+                }
                 pom {
                     description.set(
                         project.description.takeIf { it != rootProject.description } ?:
