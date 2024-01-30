@@ -14,8 +14,11 @@ dependencies {
     // annotations only needed at compile time
     compileOnly("org.jetbrains:annotations:23.0.0")
     // test suite
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testImplementation(platform("org.junit:junit-bom:5.10.1"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core:5.10.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
 }
 
 java {
