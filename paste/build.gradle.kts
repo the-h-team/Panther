@@ -4,12 +4,13 @@
 
 plugins {
     id("panther.java-conventions")
-    id("panther.guava-conventions")
     id("panther.publish-conventions")
     id("panther.external-shadow-conventions")
 }
 
 dependencies {
+    // Hide guava from consumers
+    implementation(libs.guava)
     // Expose "panther-common" to consumers
     api(project(":panther-common"))
 }
