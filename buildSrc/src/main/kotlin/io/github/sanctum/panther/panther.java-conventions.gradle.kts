@@ -12,13 +12,15 @@ repositories {
 
 dependencies {
     // annotations only needed at compile time
-    compileOnly("org.jetbrains:annotations:23.0.0")
+    compileOnly("org.jetbrains:annotations:24.0.0")
     // test suite
-    testImplementation(platform("org.junit:junit-bom:5.10.1"))
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform("org.junit:junit-bom:5.11.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.mockito:mockito-core:5.10.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // mockito
+    val mockitoVersion = "5.13.0"
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
 }
 
 java {
@@ -27,7 +29,7 @@ java {
     }
 }
 
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
