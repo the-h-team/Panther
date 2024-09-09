@@ -6,7 +6,6 @@
 
 plugins {
     id("panther.java-conventions")
-    id("panther.guava-conventions")
     id("panther.publish-conventions")
     id("panther.external-shadow-conventions")
 }
@@ -14,6 +13,8 @@ plugins {
 val gsonVersion by extra("2.9.0")
 
 dependencies {
+    // Hide guava from consumers
+    implementation(libs.guava)
     // Expose upstream libraries to consumers
     api("com.google.code.gson:gson:$gsonVersion")
     api(

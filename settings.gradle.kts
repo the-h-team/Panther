@@ -18,6 +18,10 @@ plugins {
 
 dependencyResolutionManagement {
     versionCatalogs {
-        // TODO
+        create("libs") {
+            // guava - Release notes: https://github.com/google/guava/releases/tag/v31.1
+            version("guava", "31.1-jre")
+            library("guava", "com.google.guava", "guava").versionRef("guava")
+        }
     }
 }
