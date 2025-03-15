@@ -13,5 +13,5 @@ repositories {
 }
 
 dependencies {
-    implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
+    implementation("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:8.3.6")
 }
