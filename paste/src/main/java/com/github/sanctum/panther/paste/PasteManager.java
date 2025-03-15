@@ -12,8 +12,6 @@ import com.github.sanctum.panther.paste.type.Pastebin;
 import com.github.sanctum.panther.paste.type.PastebinUser;
 import com.github.sanctum.panther.recursive.Service;
 import com.github.sanctum.panther.recursive.ServiceFactory;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,7 +25,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -101,9 +98,7 @@ public interface PasteManager extends Service {
 									conn.setRequestMethod("GET");
 									conn.setRequestProperty("User-Agent", "Hastebin Java Api");
 									conn.setUseCaches(false);
-									// TODO: Look to replace guava usage with different library
-									List<String> lines = Resources.readLines(conn.getURL(), Charsets.UTF_8);
-									return lines.toArray(new String[0]);
+									return new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)).lines().toArray(String[]::new);
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}

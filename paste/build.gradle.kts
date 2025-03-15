@@ -9,8 +9,6 @@ plugins {
 }
 
 dependencies {
-    // Hide guava from consumers
-    implementation(libs.guava)
     // Expose "panther-common" to consumers
     api(project(":panther-common"))
 }
