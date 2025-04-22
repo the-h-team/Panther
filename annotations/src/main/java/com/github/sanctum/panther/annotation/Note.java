@@ -1,26 +1,30 @@
 package com.github.sanctum.panther.annotation;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-//FIXME narrow scope to specific usages
-// by this i mean split this into multiple annotations of greater semantic value each with appropriately narrow target contexts
-//TODO remove if we no longer use this
 /**
- * <p>Where javadoc sometimes fails provide safe and easy usage examples or explanations to most object types for IDE's</p>
+ * Adds to elements notes accessible with runtime inspection.
+ *
+ * @since 1.0.0
+ * @author Hempfest
+ * @author Matt
  */
 @Documented
-@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.ANNOTATION_TYPE, ElementType.TYPE_USE})
 public @interface Note {
 
 	/**
-	 * @return The developer comment for this example.
+	 * Gets the notes for this element.
+	 *
+	 * @return the notes or details for a given element
 	 */
-	String value() default "no comment";
+	@NotNull String value() default "";
 
 }
