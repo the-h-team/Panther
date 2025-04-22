@@ -19,8 +19,7 @@ class AnnotationMapImpl<T> implements AnnotationMap<T> {
     final List<Method> allAnnotatedMethods = new LinkedList<>();
 
 
-    // TODO package-private? (remove public modifier)
-    public AnnotationMapImpl(T subject) {
+    AnnotationMapImpl(T subject) {
         this.subject = subject;
         for (Method method : subject.getClass().getMethods()) {
             insert(method);
