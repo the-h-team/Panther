@@ -1,7 +1,6 @@
 package com.github.sanctum.panther.util;
 
 import com.github.sanctum.panther.annotation.Experimental;
-import com.github.sanctum.panther.annotation.Voluntary;
 import com.github.sanctum.panther.container.ImmutablePantherMap;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherEntryMap;
@@ -33,7 +32,7 @@ public abstract class AbstractClassLoader<T> extends URLClassLoader {
 	protected final T mainClass;
 	protected ClassLoader bukkitHandler;
 
-	protected AbstractClassLoader(File file, ClassLoader parent, @Voluntary("Optional constructor arguments") Object... args) throws IOException {
+	protected AbstractClassLoader(@NotNull File file, ClassLoader parent, Object... args) throws IOException {
 		this(file, null, parent, args);
 	}
 
