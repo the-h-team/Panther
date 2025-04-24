@@ -28,3 +28,4 @@ jobs:
     with:
       gradle_args: "shadowJar publish"
       cache_save: false
+      restore: true
