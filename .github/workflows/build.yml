@@ -17,14 +17,14 @@ permissions:
 jobs:
   test-build:
     name: "Test build"
-    uses: the-h-team/workflows/.github/workflows/gradle.yml@a559a94b44a251993df0227e7cf79e9d07ef314d
+    uses: the-h-team/workflows/.github/workflows/gradle.yml@dfd82cd2326552ef4b945e457dffd446a692e73e
     with:
       gradle_args: "build shadowJar"
   dispatched-deploy:
     name: "Deploy to GitHub Packages"
     needs: test-build
     if: github.event_name == 'workflow_dispatch'
-    uses: the-h-team/workflows/.github/workflows/gradle.yml@a559a94b44a251993df0227e7cf79e9d07ef314d
+    uses: the-h-team/workflows/.github/workflows/gradle.yml@dfd82cd2326552ef4b945e457dffd446a692e73e
     with:
       gradle_args: "shadowJar publish"
       cache_save: false
