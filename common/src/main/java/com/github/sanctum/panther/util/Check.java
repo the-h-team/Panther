@@ -17,12 +17,11 @@ public class Check {
 		}
 	}
 
-	public static @Json
-	boolean isJson(@NotNull String string) {
-		return string.startsWith("{") || string.startsWith("[") && string.endsWith("{") || string.endsWith("[");
+	public static @Json	boolean isJson(String string) {
+		return string != null && (string.startsWith("{") || string.startsWith("[") && string.endsWith("{") || string.endsWith("["));
 	}
 
-	public static @Json String forJson(@NotNull String string, @NotNull String message) {
+	public static @Json String forJson(String string, @NotNull String message) {
 		if (!isJson(string)) {
 			throw new IllegalArgumentException(message);
 		}
@@ -36,12 +35,12 @@ public class Check {
 		return true;
 	}
 
-	public static <T> @NotNull T forNull(T t) {
+	public static <T> T forNull(T t) {
 		if (t == null) throw new NullPointerException("Value cannot be null!");
 		return forWarnings(t);
 	}
 
-	public static <T> @NotNull T forNull(T t, String message) {
+	public static <T> T forNull(T t, String message) {
 		if (t == null) throw new NullPointerException(message);
 		return forWarnings(t);
 	}

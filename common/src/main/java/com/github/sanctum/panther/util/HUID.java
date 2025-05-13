@@ -5,7 +5,11 @@ import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Hempfest.Unique.Identifier, a 12 character long string containing letters and numbers.
+ * Hub.Unique.Identifier, a 12 character long string containing letters and numbers.
+ *
+ * This identifier set apart from a UUID is an ID that shares similarities yet is restricted in range.
+ * Its existence is more for situations that will not theoretically be able to reach said limitations.
+ * *NOTE:* If working with large data structures with file pointers that exceed the thousands do not use this.
  *
  * @author Hempfest
  */
