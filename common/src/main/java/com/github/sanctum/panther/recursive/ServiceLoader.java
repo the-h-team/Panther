@@ -1,5 +1,6 @@
 package com.github.sanctum.panther.recursive;
 
+import com.github.sanctum.panther.util.EasyTypeAdapter;
 import com.github.sanctum.panther.util.TypeAdapter;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,7 @@ public final class ServiceLoader {
 	 * @return The same service loader instance.
 	 */
 	public <R> ServiceLoader supplyFresh(@NotNull Supplier<R> supplier) {
-		TypeAdapter<R> adapter = TypeAdapter.get();
+		TypeAdapter<R> adapter = new EasyTypeAdapter<R>(){};
 		if (!classHandle.isAssignableFrom(adapter.getType()))
 			throw new IllegalStateException("Class " + adapter.getType().getSimpleName() + " does not inherit from " + classHandle.getSimpleName());
 		this.serviceSupplier = supplier;

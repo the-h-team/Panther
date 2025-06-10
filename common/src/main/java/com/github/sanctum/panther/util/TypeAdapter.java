@@ -22,9 +22,5 @@ public interface TypeAdapter<T> extends Type {
 		return (T) o;
 	}
 
-	static <T> TypeAdapter<T> get() {
-		return new EasyTypeAdapter<>();
-	}
-
 
 }

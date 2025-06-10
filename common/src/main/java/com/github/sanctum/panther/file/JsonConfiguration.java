@@ -223,7 +223,7 @@ public class JsonConfiguration extends AbstractJsonConfiguration {
 						Object ob = j.get(d.getKey());
 						Object o;
 						if (ob instanceof String) {
-							Map<String, Object> map = g.fromJson((String) ob, new EasyTypeAdapter<Map<String, Object>>());
+							Map<String, Object> map = g.fromJson((String) ob, new EasyTypeAdapter<Map<String, Object>>(){});
 							o = d.getValue().read(map);
 						} else {
 							o = d.getValue().read((Map<String, Object>) ob);

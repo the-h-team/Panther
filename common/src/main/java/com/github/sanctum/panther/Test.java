@@ -7,6 +7,9 @@ import com.github.sanctum.panther.executable.Executable;
 import com.github.sanctum.panther.executable.TestExecutable;
 import com.github.sanctum.panther.file.JsonAdapter;
 import com.github.sanctum.panther.file.Node;
+import com.github.sanctum.panther.util.EasyTypeAdapter;
+import com.github.sanctum.panther.util.HUID;
+import com.github.sanctum.panther.util.TypeAdapter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.io.File;
@@ -28,6 +31,7 @@ public final class Test implements JsonAdapter<Test>, Vent.Host {
 	}
 
 	public static void main(String[] args) throws Exception {
+		/*
 		CommandProcessor processor = new CommandProcessor() {
 		};
 		processor.register(new TestExecutable());
@@ -38,6 +42,9 @@ public final class Test implements JsonAdapter<Test>, Vent.Host {
 		if (inquiry.canRun()) {
 			inquiry.run();
 		}
+		 */
+		TypeAdapter<HUID> adapter = new EasyTypeAdapter<HUID>(){};
+		System.out.println("Got adapter " + adapter.getTypeName());
 	}
 
 	@Override
