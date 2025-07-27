@@ -43,8 +43,9 @@ public final class Test implements JsonAdapter<Test>, Vent.Host {
 			inquiry.run();
 		}
 		 */
-		TypeAdapter<HUID> adapter = new EasyTypeAdapter<HUID>(){};
-		System.out.println("Got adapter " + adapter.getTypeName());
+		ClanTest test = new ClanTest();
+		String string = test.getValue("port.now");
+		System.out.println("Got adapter " + string);
 	}
 
 	@Override
