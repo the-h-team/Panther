@@ -1,3 +1,4 @@
+import com.github.sanctum.panther.paste.PasteManager;
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,6 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 class HastebinTest {
     @TempDir
     File temp;
+
+    @Test
+    void read() {
+        String[] results = PasteManager.getInstance().newHaste().read("test").getAll();
+        Arrays.stream(results).forEach(System.out::println);
+    }
 
     @Test
     void newRead() {
