@@ -1,6 +1,6 @@
 package com.github.sanctum.panther.file;
 
-import com.github.sanctum.panther.annotation.AnnotationDiscovery;
+import com.github.sanctum.panther.annotation.util.AnnotationDiscovery;
 import com.github.sanctum.panther.annotation.Ordinal;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

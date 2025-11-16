@@ -1,6 +1,6 @@
 package com.github.sanctum.panther.event;
 
-import com.github.sanctum.panther.annotation.AnnotationDiscovery;
+import com.github.sanctum.panther.annotation.util.AnnotationDiscovery;
 import com.github.sanctum.panther.container.PantherCollection;
 import com.github.sanctum.panther.container.PantherList;
 import com.github.sanctum.panther.file.Configurable;

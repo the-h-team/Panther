@@ -1,4 +1,4 @@
-package com.github.sanctum.panther.annotation;
+package com.github.sanctum.panther.annotation.util;
 
 import java.lang.annotation.Annotation;
 

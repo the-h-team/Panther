@@ -1,6 +1,6 @@
 package com.github.sanctum.panther.util;
 
-import com.github.sanctum.panther.annotation.AnnotationDiscovery;
+import com.github.sanctum.panther.annotation.util.AnnotationDiscovery;
 import com.github.sanctum.panther.annotation.Ordinal;
 
 import java.lang.reflect.Method;
